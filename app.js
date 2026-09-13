@@ -1,6 +1,7 @@
 // Safe Location V1: everything happens in the browser. No account or server is used.
 const STORAGE_KEY = "safe-location-history";
 const MAX_HISTORY_POINTS = 100;
+const LOCATION_NAME_MOVEMENT_THRESHOLD_METERS = 50;
 
 const elements = {
   start: document.querySelector("#start-button"),
@@ -10,6 +11,7 @@ const elements = {
   state: document.querySelector("#tracking-state"),
   latitude: document.querySelector("#latitude"),
   longitude: document.querySelector("#longitude"),
+  locationName: document.querySelector("#location-name"),
   accuracy: document.querySelector("#accuracy"),
   lastUpdate: document.querySelector("#last-update"),
   historyList: document.querySelector("#history-list"),
@@ -22,6 +24,8 @@ let map;
 let currentMarker;
 let accuracyCircle;
 let historyLayer;
+let lastNamedPoint = null;
+let locationNameRequest;
 
 function loadHistory() {
   try {
@@ -70,6 +74,52 @@ function formatCoordinate(value) { return Number(value).toFixed(6); }
 function formatTime(timestamp) { return new Date(timestamp).toLocaleString(); }
 function formatAccuracy(value) { return `${Math.round(value)} m`; }
 
+function distanceInMeters(pointA, pointB) {
+  const earthRadius = 6371000;
+  const latitudeDifference = ((pointB.latitude - pointA.latitude) * Math.PI) / 180;
+  const longitudeDifference = ((pointB.longitude - pointA.longitude) * Math.PI) / 180;
+  const a =
+    Math.sin(latitudeDifference / 2) ** 2 +
+    Math.cos((pointA.latitude * Math.PI) / 180) *
+      Math.cos((pointB.latitude * Math.PI) / 180) *
+      Math.sin(longitudeDifference / 2) ** 2;
+  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function updateLocationName(point) {
+  // Avoid repeatedly sending nearly identical coordinates to the lookup service.
+  if (
+    lastNamedPoint &&
+    distanceInMeters(lastNamedPoint, point) < LOCATION_NAME_MOVEMENT_THRESHOLD_METERS
+  ) {
+    return;
+  }
+
+  if (locationNameRequest) locationNameRequest.abort();
+  locationNameRequest = new AbortController();
+  elements.locationName.textContent = "Finding location name...";
+
+  try {
+    const url = new URL("https://nominatim.openstreetmap.org/reverse");
+    url.search = new URLSearchParams({
+      format: "jsonv2",
+      lat: point.latitude,
+      lon: point.longitude,
+      zoom: "18"
+    });
+    const response = await fetch(url, { signal: locationNameRequest.signal });
+    if (!response.ok) throw new Error("Location name lookup failed");
+
+    const result = await response.json();
+    elements.locationName.textContent = result.display_name || "No location name found";
+    lastNamedPoint = point;
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      elements.locationName.textContent = "Location name unavailable";
+    }
+  }
+}
+
 function startTracking() {
   if (!navigator.geolocation) {
     setMessage("This browser does not support location tracking.", "error");
@@ -107,6 +157,8 @@ function handlePosition(position) {
   elements.longitude.textContent = formatCoordinate(point.longitude);
   elements.accuracy.textContent = formatAccuracy(point.accuracy);
   elements.lastUpdate.textContent = formatTime(point.timestamp);
+
+  updateLocationName(point);
 
   history.unshift(point);
   history = history.slice(0, MAX_HISTORY_POINTS);

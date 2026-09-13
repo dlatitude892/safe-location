@@ -74,6 +74,7 @@ h1 { max-width: 9ch; margin-bottom: 0.75rem; font-size: clamp(2.45rem, 8vw, 4.35
 
 .location-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin: 0; border: 1px solid var(--border); border-radius: 10px; background: var(--border); }
 .location-details > div { min-width: 0; padding: 0.9rem; background: var(--surface); }
+.location-details .location-name-row { grid-column: 1 / -1; }
 dt { color: var(--text-muted); font-size: 0.8rem; font-weight: 650; }
 dd { margin: 0.25rem 0 0; overflow-wrap: anywhere; font-size: 1rem; font-variant-numeric: tabular-nums; font-weight: 730; }
 
