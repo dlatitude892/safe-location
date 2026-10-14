@@ -1,0 +1,839 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T10:21:52.811Z",
+  "title": "Design System: Safe Location",
+  "extensions": {
+    "provenance": "Recorded after the build (palette \"Violet night\") from style.css, landing.css, landing.js, index.html, welcome.html, account.html, emergency.html, trips.html, signin.html, app.js and tests/landing.spec.js. Rendered evidence: .impeccable/review/*.png, Playwright captures of the real app against a throwaway local server with simulated GPS. landing-desktop-hero.png, landing-mobile-full.png and tracker-desktop.png were copied from the session scratchpad design/l1 captures taken after the Violet night palette and /welcome shipped; the other review images predate the palette change.",
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "Night Violet",
+        "canonical": "#0b0a14",
+        "oklch": "oklch(15.2% 0.021 288.2)",
+        "tonalRamp": [
+          "oklch(15% 0.021 288.2)",
+          "oklch(26% 0.021 288.2)",
+          "oklch(37% 0.021 288.2)",
+          "oklch(48% 0.021 288.2)",
+          "oklch(59% 0.021 288.2)",
+          "oklch(70% 0.021 288.2)",
+          "oklch(82% 0.021 288.2)",
+          "oklch(95% 0.021 288.2)"
+        ]
+      },
+      "bg-header": {
+        "role": "neutral",
+        "displayName": "Header Violet",
+        "canonical": "#0e0c19",
+        "oklch": "oklch(16.4% 0.027 290.1)",
+        "tonalRamp": [
+          "oklch(15% 0.027 290.1)",
+          "oklch(26% 0.027 290.1)",
+          "oklch(37% 0.027 290.1)",
+          "oklch(48% 0.027 290.1)",
+          "oklch(59% 0.027 290.1)",
+          "oklch(70% 0.027 290.1)",
+          "oklch(82% 0.027 290.1)",
+          "oklch(95% 0.027 290.1)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Charcoal Violet",
+        "canonical": "#15131f",
+        "oklch": "oklch(19.5% 0.024 291.7)",
+        "tonalRamp": [
+          "oklch(15% 0.024 291.7)",
+          "oklch(26% 0.024 291.7)",
+          "oklch(37% 0.024 291.7)",
+          "oklch(48% 0.024 291.7)",
+          "oklch(59% 0.024 291.7)",
+          "oklch(70% 0.024 291.7)",
+          "oklch(82% 0.024 291.7)",
+          "oklch(95% 0.024 291.7)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Veiled Charcoal",
+        "canonical": "rgb(21 19 31 / 0.86)",
+        "oklch": "oklch(19.5% 0.024 291.7 / 0.86)",
+        "tonalRamp": [
+          "oklch(15% 0.024 291.7)",
+          "oklch(26% 0.024 291.7)",
+          "oklch(37% 0.024 291.7)",
+          "oklch(48% 0.024 291.7)",
+          "oklch(59% 0.024 291.7)",
+          "oklch(70% 0.024 291.7)",
+          "oklch(82% 0.024 291.7)",
+          "oklch(95% 0.024 291.7)"
+        ]
+      },
+      "surface-raised": {
+        "role": "neutral",
+        "displayName": "Raised Charcoal",
+        "canonical": "#1d1a2b",
+        "oklch": "oklch(23% 0.033 291.7)",
+        "tonalRamp": [
+          "oklch(15% 0.033 291.7)",
+          "oklch(26% 0.033 291.7)",
+          "oklch(37% 0.033 291.7)",
+          "oklch(48% 0.033 291.7)",
+          "oklch(59% 0.033 291.7)",
+          "oklch(70% 0.033 291.7)",
+          "oklch(82% 0.033 291.7)",
+          "oklch(95% 0.033 291.7)"
+        ]
+      },
+      "map-bg": {
+        "role": "neutral",
+        "displayName": "Map Ground",
+        "canonical": "#120f1d",
+        "oklch": "oklch(18% 0.029 293.1)",
+        "tonalRamp": [
+          "oklch(15% 0.029 293.1)",
+          "oklch(26% 0.029 293.1)",
+          "oklch(37% 0.029 293.1)",
+          "oklch(48% 0.029 293.1)",
+          "oklch(59% 0.029 293.1)",
+          "oklch(70% 0.029 293.1)",
+          "oklch(82% 0.029 293.1)",
+          "oklch(95% 0.029 293.1)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#2a2640",
+        "oklch": "oklch(28.6% 0.047 290.1)",
+        "tonalRamp": [
+          "oklch(15% 0.047 290.1)",
+          "oklch(26% 0.047 290.1)",
+          "oklch(37% 0.047 290.1)",
+          "oklch(48% 0.047 290.1)",
+          "oklch(59% 0.047 290.1)",
+          "oklch(70% 0.047 290.1)",
+          "oklch(82% 0.047 290.1)",
+          "oklch(95% 0.047 290.1)"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#3b3557",
+        "oklch": "oklch(35.1% 0.059 291.2)",
+        "tonalRamp": [
+          "oklch(15% 0.059 291.2)",
+          "oklch(26% 0.059 291.2)",
+          "oklch(37% 0.059 291.2)",
+          "oklch(48% 0.059 291.2)",
+          "oklch(59% 0.059 291.2)",
+          "oklch(70% 0.059 291.2)",
+          "oklch(82% 0.059 291.2)",
+          "oklch(95% 0.059 291.2)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control Outline",
+        "canonical": "#7a7299",
+        "oklch": "oklch(57.4% 0.06 293.8)",
+        "tonalRamp": [
+          "oklch(15% 0.06 293.8)",
+          "oklch(26% 0.06 293.8)",
+          "oklch(37% 0.06 293.8)",
+          "oklch(48% 0.06 293.8)",
+          "oklch(59% 0.06 293.8)",
+          "oklch(70% 0.06 293.8)",
+          "oklch(82% 0.06 293.8)",
+          "oklch(95% 0.06 293.8)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#eeeaf7",
+        "oklch": "oklch(94.4% 0.018 300.1)",
+        "tonalRamp": [
+          "oklch(15% 0.018 300.1)",
+          "oklch(26% 0.018 300.1)",
+          "oklch(37% 0.018 300.1)",
+          "oklch(48% 0.018 300.1)",
+          "oklch(59% 0.018 300.1)",
+          "oklch(70% 0.018 300.1)",
+          "oklch(82% 0.018 300.1)",
+          "oklch(95% 0.018 300.1)"
+        ]
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#b0a9c6",
+        "oklch": "oklch(75% 0.042 296.4)",
+        "tonalRamp": [
+          "oklch(15% 0.042 296.4)",
+          "oklch(26% 0.042 296.4)",
+          "oklch(37% 0.042 296.4)",
+          "oklch(48% 0.042 296.4)",
+          "oklch(59% 0.042 296.4)",
+          "oklch(70% 0.042 296.4)",
+          "oklch(82% 0.042 296.4)",
+          "oklch(95% 0.042 296.4)"
+        ]
+      },
+      "text-faint": {
+        "role": "neutral",
+        "displayName": "Faint Ink",
+        "canonical": "#8d86a6",
+        "oklch": "oklch(63.7% 0.048 295)",
+        "tonalRamp": [
+          "oklch(15% 0.048 295)",
+          "oklch(26% 0.048 295)",
+          "oklch(37% 0.048 295)",
+          "oklch(48% 0.048 295)",
+          "oklch(59% 0.048 295)",
+          "oklch(70% 0.048 295)",
+          "oklch(82% 0.048 295)",
+          "oklch(95% 0.048 295)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Working Violet",
+        "canonical": "#8b5cf6",
+        "oklch": "oklch(60.6% 0.219 292.7)",
+        "tonalRamp": [
+          "oklch(15% 0.219 292.7)",
+          "oklch(26% 0.219 292.7)",
+          "oklch(37% 0.219 292.7)",
+          "oklch(48% 0.219 292.7)",
+          "oklch(59% 0.219 292.7)",
+          "oklch(70% 0.219 292.7)",
+          "oklch(82% 0.219 292.7)",
+          "oklch(95% 0.219 292.7)"
+        ]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Deep Working Violet",
+        "canonical": "#7c3aed",
+        "oklch": "oklch(54.1% 0.247 293)",
+        "tonalRamp": [
+          "oklch(15% 0.247 293)",
+          "oklch(26% 0.247 293)",
+          "oklch(37% 0.247 293)",
+          "oklch(48% 0.247 293)",
+          "oklch(59% 0.247 293)",
+          "oklch(70% 0.247 293)",
+          "oklch(82% 0.247 293)",
+          "oklch(95% 0.247 293)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Pressed Violet",
+        "canonical": "#6d28d9",
+        "oklch": "oklch(49.1% 0.241 292.6)",
+        "tonalRamp": [
+          "oklch(15% 0.241 292.6)",
+          "oklch(26% 0.241 292.6)",
+          "oklch(37% 0.241 292.6)",
+          "oklch(48% 0.241 292.6)",
+          "oklch(59% 0.241 292.6)",
+          "oklch(70% 0.241 292.6)",
+          "oklch(82% 0.241 292.6)",
+          "oklch(95% 0.241 292.6)"
+        ]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Lavender Text",
+        "canonical": "#c4b5fd",
+        "oklch": "oklch(81.1% 0.101 293.6)",
+        "tonalRamp": [
+          "oklch(15% 0.101 293.6)",
+          "oklch(26% 0.101 293.6)",
+          "oklch(37% 0.101 293.6)",
+          "oklch(48% 0.101 293.6)",
+          "oklch(59% 0.101 293.6)",
+          "oklch(70% 0.101 293.6)",
+          "oklch(82% 0.101 293.6)",
+          "oklch(95% 0.101 293.6)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Violet Wash",
+        "canonical": "rgb(139 92 246 / 0.14)",
+        "oklch": "oklch(60.6% 0.219 292.7 / 0.14)",
+        "tonalRamp": [
+          "oklch(15% 0.219 292.7)",
+          "oklch(26% 0.219 292.7)",
+          "oklch(37% 0.219 292.7)",
+          "oklch(48% 0.219 292.7)",
+          "oklch(59% 0.219 292.7)",
+          "oklch(70% 0.219 292.7)",
+          "oklch(82% 0.219 292.7)",
+          "oklch(95% 0.219 292.7)"
+        ]
+      },
+      "accent-glow": {
+        "role": "primary",
+        "displayName": "Aurora Pink",
+        "canonical": "#e879f9",
+        "oklch": "oklch(74.8% 0.207 322.2)",
+        "tonalRamp": [
+          "oklch(15% 0.207 322.2)",
+          "oklch(26% 0.207 322.2)",
+          "oklch(37% 0.207 322.2)",
+          "oklch(48% 0.207 322.2)",
+          "oklch(59% 0.207 322.2)",
+          "oklch(70% 0.207 322.2)",
+          "oklch(82% 0.207 322.2)",
+          "oklch(95% 0.207 322.2)"
+        ],
+        "purpose": "Light only: signal-field corner glow, landing aurora, closing panel, step-rail end. Never a fill, text colour or state."
+      },
+      "success": {
+        "role": "tertiary",
+        "displayName": "Confirmed Green",
+        "canonical": "#34d399",
+        "oklch": "oklch(77.3% 0.153 163.2)",
+        "tonalRamp": [
+          "oklch(15% 0.153 163.2)",
+          "oklch(26% 0.153 163.2)",
+          "oklch(37% 0.153 163.2)",
+          "oklch(48% 0.153 163.2)",
+          "oklch(59% 0.153 163.2)",
+          "oklch(70% 0.153 163.2)",
+          "oklch(82% 0.153 163.2)",
+          "oklch(95% 0.153 163.2)"
+        ]
+      },
+      "success-text": {
+        "role": "tertiary",
+        "displayName": "Confirmed Green Text",
+        "canonical": "#8ef0c9",
+        "oklch": "oklch(88.4% 0.109 166.5)",
+        "tonalRamp": [
+          "oklch(15% 0.109 166.5)",
+          "oklch(26% 0.109 166.5)",
+          "oklch(37% 0.109 166.5)",
+          "oklch(48% 0.109 166.5)",
+          "oklch(59% 0.109 166.5)",
+          "oklch(70% 0.109 166.5)",
+          "oklch(82% 0.109 166.5)",
+          "oklch(95% 0.109 166.5)"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Attention Amber",
+        "canonical": "#f5b544",
+        "oklch": "oklch(81.3% 0.145 78)",
+        "tonalRamp": [
+          "oklch(15% 0.145 78)",
+          "oklch(26% 0.145 78)",
+          "oklch(37% 0.145 78)",
+          "oklch(48% 0.145 78)",
+          "oklch(59% 0.145 78)",
+          "oklch(70% 0.145 78)",
+          "oklch(82% 0.145 78)",
+          "oklch(95% 0.145 78)"
+        ]
+      },
+      "warning-soft": {
+        "role": "secondary",
+        "displayName": "Amber Wash",
+        "canonical": "rgb(245 181 68 / 0.12)",
+        "oklch": "oklch(81.3% 0.145 78 / 0.12)",
+        "tonalRamp": [
+          "oklch(15% 0.145 78)",
+          "oklch(26% 0.145 78)",
+          "oklch(37% 0.145 78)",
+          "oklch(48% 0.145 78)",
+          "oklch(59% 0.145 78)",
+          "oklch(70% 0.145 78)",
+          "oklch(82% 0.145 78)",
+          "oklch(95% 0.145 78)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Alarm Red",
+        "canonical": "#f87171",
+        "oklch": "oklch(71.1% 0.166 22.2)",
+        "tonalRamp": [
+          "oklch(15% 0.166 22.2)",
+          "oklch(26% 0.166 22.2)",
+          "oklch(37% 0.166 22.2)",
+          "oklch(48% 0.166 22.2)",
+          "oklch(59% 0.166 22.2)",
+          "oklch(70% 0.166 22.2)",
+          "oklch(82% 0.166 22.2)",
+          "oklch(95% 0.166 22.2)"
+        ]
+      },
+      "danger-text": {
+        "role": "tertiary",
+        "displayName": "Alarm Text",
+        "canonical": "#ffb4b4",
+        "oklch": "oklch(84.1% 0.088 19.1)",
+        "tonalRamp": [
+          "oklch(15% 0.088 19.1)",
+          "oklch(26% 0.088 19.1)",
+          "oklch(37% 0.088 19.1)",
+          "oklch(48% 0.088 19.1)",
+          "oklch(59% 0.088 19.1)",
+          "oklch(70% 0.088 19.1)",
+          "oklch(82% 0.088 19.1)",
+          "oklch(95% 0.088 19.1)"
+        ]
+      },
+      "danger-soft": {
+        "role": "tertiary",
+        "displayName": "Alarm Wash",
+        "canonical": "rgb(248 113 113 / 0.12)",
+        "oklch": "oklch(71.1% 0.166 22.2 / 0.12)",
+        "tonalRamp": [
+          "oklch(15% 0.166 22.2)",
+          "oklch(26% 0.166 22.2)",
+          "oklch(37% 0.166 22.2)",
+          "oklch(48% 0.166 22.2)",
+          "oklch(59% 0.166 22.2)",
+          "oklch(70% 0.166 22.2)",
+          "oklch(82% 0.166 22.2)",
+          "oklch(95% 0.166 22.2)"
+        ]
+      },
+      "danger-strong": {
+        "role": "tertiary",
+        "displayName": "Emergency Red",
+        "canonical": "#dc2626",
+        "oklch": "oklch(57.7% 0.215 27.3)",
+        "tonalRamp": [
+          "oklch(15% 0.215 27.3)",
+          "oklch(26% 0.215 27.3)",
+          "oklch(37% 0.215 27.3)",
+          "oklch(48% 0.215 27.3)",
+          "oklch(59% 0.215 27.3)",
+          "oklch(70% 0.215 27.3)",
+          "oklch(82% 0.215 27.3)",
+          "oklch(95% 0.215 27.3)"
+        ]
+      },
+      "danger-strong-hover": {
+        "role": "tertiary",
+        "displayName": "Arterial Red",
+        "canonical": "#b91c1c",
+        "oklch": "oklch(50.5% 0.19 27.5)",
+        "tonalRamp": [
+          "oklch(15% 0.19 27.5)",
+          "oklch(26% 0.19 27.5)",
+          "oklch(37% 0.19 27.5)",
+          "oklch(48% 0.19 27.5)",
+          "oklch(59% 0.19 27.5)",
+          "oklch(70% 0.19 27.5)",
+          "oklch(82% 0.19 27.5)",
+          "oklch(95% 0.19 27.5)"
+        ]
+      },
+      "gap": {
+        "role": "neutral",
+        "displayName": "Gap Haze",
+        "canonical": "#a8a2bd",
+        "oklch": "oklch(72.6% 0.039 295.6)",
+        "tonalRamp": [
+          "oklch(15% 0.039 295.6)",
+          "oklch(26% 0.039 295.6)",
+          "oklch(37% 0.039 295.6)",
+          "oklch(48% 0.039 295.6)",
+          "oklch(59% 0.039 295.6)",
+          "oklch(70% 0.039 295.6)",
+          "oklch(82% 0.039 295.6)",
+          "oklch(95% 0.039 295.6)"
+        ]
+      },
+      "old-route": {
+        "role": "neutral",
+        "displayName": "Earlier Route",
+        "canonical": "#8a7fb8",
+        "oklch": "oklch(62.8% 0.085 292.6)",
+        "tonalRamp": [
+          "oklch(15% 0.085 292.6)",
+          "oklch(26% 0.085 292.6)",
+          "oklch(37% 0.085 292.6)",
+          "oklch(48% 0.085 292.6)",
+          "oklch(59% 0.085 292.6)",
+          "oklch(70% 0.085 292.6)",
+          "oklch(82% 0.085 292.6)",
+          "oklch(95% 0.085 292.6)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "hero": {
+        "displayName": "Hero",
+        "purpose": "The landing page's one headline."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Landing band headings."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Landing intro paragraph, Muted Ink; band copy 1.06rem."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "The instrument's state line only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles on account, emergency, trips and sign-in pages."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section headings inside sheets and cards."
+      },
+      "condition": {
+        "displayName": "Condition",
+        "purpose": "The one tone-carrying condition sentence."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Readout and detail values, tabular numerals; 0.9rem below 560px."
+      },
+      "reading-lg": {
+        "displayName": "Large Reading",
+        "purpose": "Headline statistics."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, messages and help."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "All buttons; 1rem for primary instrument and rail actions."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Label-over-value terms, sentence case; 0.72rem inside readouts."
+      },
+      "sos": {
+        "displayName": "SOS",
+        "purpose": "The SOS button; 800 1.85rem 'SOS' word in the narrow phone column."
+      }
+    },
+    "shadows": [
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px rgb(167 139 250 / 0.55)",
+        "purpose": "Every focusable element; replaces the outline."
+      },
+      {
+        "name": "map-control-lift",
+        "value": "0 4px 14px rgb(0 0 0 / 0.35)",
+        "purpose": "Leaflet zoom bars only."
+      },
+      {
+        "name": "marker-halo",
+        "value": "0 0 0 6px rgb(139 92 246 / 0.25), 0 2px 6px rgb(0 0 0 / 0.5)",
+        "purpose": "Latest-position marker; amber halo when flagged."
+      },
+      {
+        "name": "landing-hero-glow",
+        "value": "0 10px 30px -10px rgb(124 58 237 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.18)",
+        "purpose": "Landing page primary hero button only; tracker buttons stay shadowless."
+      },
+      {
+        "name": "landing-device",
+        "value": "0 40px 80px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.08)",
+        "purpose": "Landing device preview frame only."
+      },
+      {
+        "name": "landing-preview-panel",
+        "value": "0 30px 60px -30px rgb(0 0 0 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.06)",
+        "purpose": "Landing feature preview panels only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "tone-shift",
+        "value": "400ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Instrument edge, condition band and dot colour when the overall tone changes."
+      },
+      {
+        "name": "control-state",
+        "value": "150ms ease",
+        "purpose": "Button and switch colour and position changes."
+      },
+      {
+        "name": "breathe",
+        "value": "2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite",
+        "purpose": "Calm-tone condition dot ring; the only ambient motion in the tracker. Off under reduced motion."
+      },
+      {
+        "name": "spin",
+        "value": "0.9s linear infinite",
+        "purpose": "Map loading spinner; stops under reduced motion while the text keeps the state."
+      },
+      {
+        "name": "veil",
+        "value": "14s ease-in-out infinite alternate",
+        "purpose": "Sign-in pages only: the signal field breathes between 0.8 and 1 opacity."
+      },
+      {
+        "name": "aurora-drift",
+        "value": "26s / 32s / 38s ease-in-out infinite alternate",
+        "purpose": "Landing only: three blurred colour fields (violet, pink, indigo rgb(99 102 241)) drift and scale."
+      },
+      {
+        "name": "device-float",
+        "value": "9s ease-in-out infinite alternate",
+        "purpose": "Landing device preview tilt and float above 980px."
+      },
+      {
+        "name": "route-draw",
+        "value": "9s cubic-bezier(0.45, 0, 0.25, 1) infinite",
+        "purpose": "Landing preview route stroke-dashoffset; the pin rides it by SMIL animateMotion."
+      },
+      {
+        "name": "band-cycle",
+        "value": "4s per state, 500ms swap",
+        "purpose": "Landing preview condition band: calm, attention (offline, 3 waiting), calm (back online)."
+      },
+      {
+        "name": "rail-fill",
+        "value": "1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s",
+        "purpose": "Landing How-it-works rail, violet to pink, when the steps scroll in."
+      },
+      {
+        "name": "reveal",
+        "value": "900ms cubic-bezier(0.16, 1, 0.3, 1), 90-280ms stagger",
+        "purpose": "Landing blocks ease in once; only when JavaScript adds .motion and motion is allowed."
+      },
+      {
+        "name": "landing-loops",
+        "value": "check-in deplete 7s, SOS ping 2.6s, queue rise 3.2s",
+        "purpose": "Landing feature previews."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Stops every animation on every page; landing SVGs paused at their finished frame; tests/landing.spec.js asserts zero running animations."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "readouts-2x2",
+        "value": "1180px"
+      },
+      {
+        "name": "stacked-with-sos-column",
+        "value": "900px"
+      },
+      {
+        "name": "compact",
+        "value": "720px"
+      },
+      {
+        "name": "phone",
+        "value": "560px"
+      },
+      {
+        "name": "smallest-phone",
+        "value": "360px"
+      },
+      {
+        "name": "narrow-details",
+        "value": "340px"
+      },
+      {
+        "name": "landing-single-column",
+        "value": "980px"
+      }
+    ],
+    "conditionTones": {
+      "idle": "Grey dot, Raised Charcoal band, Hairline edge: not recording.",
+      "calm": "Working Violet: recording and reaching the server; the dot breathes.",
+      "attention": "Attention Amber: offline, stale GPS, paused or delayed trip, uploads waiting, storage failing, permission denied while recording.",
+      "alert": "Alarm Red: SOS countdown, sending, queued or active; check-in requested. Alert outranks attention, attention outranks calm."
+    },
+    "motionBudget": "The tracker stays nearly still (battery); motion lives on the landing and sign-in pages.",
+    "surfaces": {
+      "landing": {
+        "route": "/welcome",
+        "files": [
+          "welcome.html",
+          "landing.css",
+          "landing.js"
+        ],
+        "mode": "Persuade, inside the same world",
+        "linkedFrom": [
+          "tracker header \"How it works\"",
+          "tracker footer",
+          "sign-in card"
+        ],
+        "sections": [
+          "Aurora: three drifting blurred colour fields",
+          "Hero with animated device preview of the real tracker (band cycles calm, attention offline, calm back online; SVG route draw; SMIL pin)",
+          "How it works: three numbered steps with a filling rail",
+          "Feature bands: Trip check-in timer, SOS waves and countdown with honest delivery states, offline queue rising",
+          "What Safe Location will never do: ruled two-column list",
+          "Closing CTA with Call 112, hairline footer"
+        ],
+        "reveals": "Content visible by default; hidden-then-revealed only when landing.js adds .motion.",
+        "evidence": [
+          ".impeccable/review/landing-desktop-hero.png",
+          ".impeccable/review/landing-mobile-full.png"
+        ]
+      }
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one solid violet action in a region, such as Start Tracking.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg viewBox=\"0 0 24 24\"><path class=\"f\" d=\"M8 5v14l11-7z\"/></svg>Start Tracking</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:50px;padding:.55rem 1rem;border:1px solid transparent;border-radius:9px;font:650 1rem Geist,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease}.ds-btn svg{width:18px;height:18px}.ds-btn .f{fill:currentColor}.ds-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-btn-primary{background:var(--accent-strong,#7c3aed);color:#fff}.ds-btn-primary:hover{background:#6d28d9}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Raised charcoal action beside a primary, such as Start a trip or Sync now.",
+      "html": "<button class=\"ds-btn2\">Start a trip</button>",
+      "css": ".ds-btn2{min-height:50px;padding:.55rem 1rem;border:1px solid var(--border-strong,#3b3557);border-radius:9px;background:var(--surface-raised,#1d1a2b);color:var(--text,#eeeaf7);font:650 1rem Geist,system-ui,sans-serif;cursor:pointer;transition:border-color 150ms ease}.ds-btn2:hover{border-color:var(--accent,#8b5cf6)}.ds-btn2:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
+    },
+    {
+      "name": "Danger Ghost Button",
+      "kind": "button",
+      "refersTo": "button-danger-ghost",
+      "description": "Outline-only red for irreversible removal: clear history, remove, delete, cancel trip.",
+      "html": "<button class=\"ds-btn-dg\">Clear history</button>",
+      "css": ".ds-btn-dg{min-height:38px;padding:.4rem .8rem;border:1px solid var(--border,#2a2640);border-radius:9px;background:none;color:var(--danger,#f87171);font:650 .85rem Geist,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease}.ds-btn-dg:hover{border-color:var(--danger,#f87171);background:rgb(248 113 113 / .12)}.ds-btn-dg:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Label above, raised charcoal field with a 3:1 control outline.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-e\">Email</label><input id=\"ds-e\" type=\"email\" placeholder=\"you@example.com\"></div>",
+      "css": ".ds-field{display:grid;gap:.35rem;font-family:Geist,system-ui,sans-serif}.ds-field label{color:var(--text-muted,#b0a9c6);font-size:.82rem;font-weight:600}.ds-field input{min-height:44px;padding:.5rem .75rem;border:1px solid var(--control-border,#7a7299);border-radius:9px;background:var(--surface-raised,#1d1a2b);color:var(--text,#eeeaf7);font:inherit}.ds-field input:focus-visible{border-color:var(--accent,#8b5cf6);outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Round header status with a state dot.",
+      "html": "<span class=\"ds-pill\"><span class=\"ds-dot\"></span>Online</span> <span class=\"ds-pill ds-off\"><span class=\"ds-dot\"></span>Offline</span>",
+      "css": ".ds-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .7rem;border:1px solid var(--border,#2a2640);border-radius:999px;background:var(--surface,#15131f);color:var(--text-muted,#b0a9c6);font:600 .8rem Geist,system-ui,sans-serif}.ds-dot{width:7px;height:7px;border-radius:50%;background:var(--success,#34d399)}.ds-off{border-color:rgb(245 181 68 / .45);background:rgb(245 181 68 / .12);color:var(--warning,#f5b544)}.ds-off .ds-dot{background:var(--warning,#f5b544)}"
+    },
+    {
+      "name": "History Badges",
+      "kind": "chip",
+      "refersTo": "badge-warning",
+      "description": "Amber for doubtful data (GPS jump), red only for failure.",
+      "html": "<span class=\"ds-badge ds-w\">GPS jump</span> <span class=\"ds-badge ds-d\">Rejected by server</span>",
+      "css": ".ds-badge{padding:.12rem .5rem;border:1px solid var(--border,#2a2640);border-radius:999px;font:650 .72rem Geist,system-ui,sans-serif;white-space:nowrap}.ds-w{border-color:rgb(245 181 68 / .4);background:rgb(245 181 68 / .12);color:var(--warning,#f5b544)}.ds-d{border-color:rgb(248 113 113 / .4);background:rgb(248 113 113 / .12);color:var(--danger,#f87171)}"
+    },
+    {
+      "name": "Status Instrument",
+      "kind": "custom",
+      "refersTo": "readout",
+      "description": "Signature: one tone-carrying condition band over a state line and hairline-ruled readouts.",
+      "html": "<section class=\"ds-inst\"><p class=\"ds-cond\"><span class=\"ds-cd\"></span>Recording every 1 minute</p><div class=\"ds-ib\"><p class=\"ds-state\">Tracking active</p><dl class=\"ds-ro\"><div><dt>GPS</dt><dd>±16 m · just now</dd></div><div><dt>Connection</dt><dd>Online</dd></div><div><dt>Backup</dt><dd>All uploaded</dd></div><div><dt>Saved here</dt><dd>128 points</dd></div></dl></div></section>",
+      "css": ".ds-inst{--tone:#8b5cf6;border:1px solid rgb(139 92 246 / .5);border-radius:14px;background:var(--surface,#15131f);color:var(--text,#eeeaf7);font-family:Geist,system-ui,sans-serif;overflow:hidden;transition:border-color 400ms cubic-bezier(.16,1,.3,1)}.ds-cond{display:flex;align-items:center;gap:.6rem;margin:0;padding:.55rem 1.1rem;border-bottom:1px solid rgb(139 92 246 / .5);background:rgb(139 92 246 / .13);color:var(--accent-text,#c4b5fd);font-size:.9rem;font-weight:650}.ds-cd{position:relative;width:10px;height:10px;border-radius:50%;background:var(--tone)}.ds-cd::after{content:'';position:absolute;inset:-4px;border:2px solid var(--tone);border-radius:50%;animation:ds-br 2.4s cubic-bezier(.16,1,.3,1) infinite}@keyframes ds-br{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(1.6)}}@media (prefers-reduced-motion:reduce){.ds-cd::after{animation:none;opacity:0}}.ds-ib{padding:1rem 1.1rem 1.1rem}.ds-state{margin:0;font-size:2rem;font-weight:700;letter-spacing:-.025em;line-height:1.15}.ds-ro{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin:1rem 0 0;border:1px solid var(--border,#2a2640);border-radius:9px;background:var(--border,#2a2640);overflow:hidden}.ds-ro div{padding:.6rem .75rem .65rem;background:var(--surface,#15131f)}.ds-ro dt{color:var(--text-muted,#b0a9c6);font-size:.72rem;font-weight:600}.ds-ro dd{margin:.2rem 0 0;font-size:1rem;font-weight:650;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "SOS Column",
+      "kind": "custom",
+      "refersTo": "button-sos",
+      "description": "Signature: Emergency Red SOS with Call 112 pinned beneath.",
+      "html": "<section class=\"ds-sos\"><button class=\"ds-sosb\">Send SOS</button><a class=\"ds-112\" href=\"#\">In immediate danger? <strong>Call 112</strong></a></section>",
+      "css": ".ds-sos{display:flex;flex-direction:column;gap:1rem;padding:1.1rem;border:1px solid rgb(248 113 113 / .35);border-radius:14px;background:var(--surface,#15131f);font-family:Geist,system-ui,sans-serif}.ds-sosb{min-height:56px;border:0;border-radius:9px;background:var(--danger-strong,#dc2626);color:#fff;font:750 1.1rem Geist,system-ui,sans-serif;letter-spacing:.02em;cursor:pointer;transition:background-color 150ms ease}.ds-sosb:hover{background:#b91c1c}.ds-sosb:focus-visible,.ds-112:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-112{display:flex;align-items:center;justify-content:center;gap:.3em;min-height:44px;border:1px solid rgb(248 113 113 / .45);border-radius:9px;color:#ffb4b4;text-decoration:none}.ds-112:hover{background:rgb(248 113 113 / .12)}"
+    },
+    {
+      "name": "Ruled Sheet",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "One panel whose sections are divided by hairlines instead of separate cards.",
+      "html": "<div class=\"ds-sheet\"><section><h2>Recording</h2><p>Every 1 minute</p></section><section><h2>Backup and sync</h2><p>Synchronization complete</p></section></div>",
+      "css": ".ds-sheet{border:1px solid var(--border,#2a2640);border-radius:14px;background:var(--surface,#15131f);color:var(--text,#eeeaf7);font-family:Geist,system-ui,sans-serif}.ds-sheet section{padding:1.1rem}.ds-sheet section+section{border-top:1px solid var(--border,#2a2640)}.ds-sheet h2{margin:0 0 .5rem;font-size:1.0625rem;font-weight:650;letter-spacing:-.01em}.ds-sheet p{margin:0;color:var(--text-muted,#b0a9c6)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Status Instrument",
+    "overview": "Safe Location reads like an instrument panel on a dark violet night, not a dashboard of equal cards. One live panel answers \"am I being recorded, and is it reaching anyone?\" before anything else: a single condition band carries the overall tone in one plain sentence, a large state line names what is happening, and a ruled grid of label-over-value readouts gives the evidence. Everything else (map, trip, recording settings, backup, details, history) sits below or beside it at lower weight.\n\nDensity is moderate and calm. Panels are charcoal-violet sheets divided by hairline rules rather than stacks of floating cards; colour is almost entirely neutral until something needs a person's attention, and then it appears in exactly one place, with one meaning. The face is Geist, self-hosted and small (29 KB for Latin), so the product reads like a modern SaaS tool without a font service; text shows at once in the system font and swaps when Geist arrives. Behind everything lies the signal field: soft violet light falling from the top of the screen with a faint pink glow at one corner, a point grid like a map graticule, and fine grain.\n\nMotion follows a budget. The tracker stays open for hours on a phone battery, so it is nearly still: colour changes ease over 400ms and the only thing that moves on its own is the breathing dot while recording is healthy. Motion lives on the short-visit pages: the sign-in veil breathes, and the public landing page at /welcome (a Persuade-mode page in the same world) drifts an aurora and animates a preview of the real tracker.\n\nThe world is honest about uncertainty. Readings show their age and accuracy in tabular numerals, gaps are drawn as dashed lines, doubtful points are amber and left off the route, and nothing in the copy claims a message was delivered unless the provider confirmed it. The landing page's previews only show states the product really shows.",
+    "keyCharacteristics": [
+      "One tone-carrying condition band per screen, driven by state (idle grey, calm violet, attention amber, alert red).",
+      "Hairline-ruled grids and sheets with ruled sections instead of card stacks.",
+      "Violet means working, amber means attention, red means emergency, failure or irreversible removal.",
+      "Geist (self-hosted, system fallback), weights 600 to 750, tabular numerals for every reading.",
+      "The signal field background: violet light from above, a pink side glow, a fading point grid, grain. CSS only.",
+      "Flat, bordered surfaces in the tracker; depth only on map controls and markers.",
+      "A tall red SOS always within thumb reach, with \"Call 112\" under it.",
+      "Motion budget: the tracker nearly still, motion on the landing and sign-in pages, all of it off under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Red Means Danger Rule",
+        "body": "Red appears only for an emergency (SOS, Call 112, alert tone, check-in requested), a failure (denied permission, rejected upload, error) or an irreversible removal (delete, remove, clear, cancel trip). Removal is outline-only red unless it is the confirmed final submit. A merely doubtful reading is amber, never red.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Meaning Per Hue Rule",
+        "body": "Violet is working state, amber is attention, green is confirmed fact. A hue never borrows another's meaning, and state is never carried by colour alone: every tone has a sentence or a label. Aurora Pink is light, not a state, so it carries no meaning at all.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Reading Rule",
+        "body": "Every number that updates (times, countdowns, accuracy, coordinates, counts) is set with tabular numerals so live readings tick without layout shift. This holds inside the landing previews too.",
+        "section": "typography"
+      },
+      {
+        "name": "The Light Font Rule",
+        "body": "One self-hosted family only (Geist), subset by script and loaded with `swap`, so text never waits for a download. No font services, no icon fonts, no second display family.",
+        "section": "typography"
+      },
+      {
+        "name": "The Instrument First Rule",
+        "body": "On every viewport the condition band, state line and readouts come before the map, with SOS beside them within thumb reach.",
+        "section": "layout"
+      },
+      {
+        "name": "The Ruled Not Stacked Rule",
+        "body": "Group related panels as one sheet whose sections are divided by hairlines, and lay readings on a grid whose 1px gaps show the border colour. Do not stack floating, shadowed cards.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Motion Budget Rule",
+        "body": "The tracker stays nearly still because it runs for hours on a phone battery: only the calm-tone breathing dot, the map spinner and short colour transitions. Ambient motion belongs to short-visit pages (sign-in, landing). Everywhere, `prefers-reduced-motion: reduce` stops every animation, and content never depends on motion to be visible.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** let one condition band per screen carry the overall tone, with a plain sentence that names what is happening.",
+      "**Do** use Working Violet for working state, Attention Amber for attention, and red only for emergency, failure and irreversible removal.",
+      "**Do** keep Aurora Pink as light only: field glows, aurora, rail ends; never a fill, text colour or state.",
+      "**Do** set every live reading in tabular numerals at 650 weight, label over value, on a hairline-ruled grid.",
+      "**Do** group related sections into one sheet divided by 1px hairlines.",
+      "**Do** keep primary controls at least 44px tall and keep accessible names when a label is visually hidden.",
+      "**Do** honour reduced motion everywhere: stop the breathing dot, spinner, veil, aurora, previews and colour transitions, and keep content visible without motion or JavaScript.",
+      "**Do** make landing previews show only states the product really shows, in the same honest delivery language.",
+      "**Do** show age and accuracy with every location and say \"simulated\" or \"submitted\" until a provider confirms delivery."
+    ],
+    "donts": [
+      "**Don't** use red for a doubtful reading such as a GPS jump or low accuracy; that is amber.",
+      "**Don't** add ambient motion to the tracker; the breathing dot in the calm tone is the only thing that moves there on its own. Motion belongs to the landing and sign-in pages.",
+      "**Don't** add eyebrows or kickers (small uppercase labels above headings); section titles stand alone in sentence case.",
+      "**Don't** stack shadowed, same-weight cards where a ruled sheet will do, and don't carry landing glows and shadows into the tracker.",
+      "**Don't** add font services, a second family or icon fonts; use self-hosted Geist and inline SVG icons.",
+      "**Don't** claim a message was delivered, or that someone is safe or in danger, without provider confirmation or the person's own action.",
+      "**Don't** fabricate streets, routes, accuracy or results to fill an empty state; say what is unknown."
+    ]
+  }
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a14" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Emergency contacts and SOS · Safe Location</title>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="account-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Safe Location tracker">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+      <div class="header-status">
+        <a class="pill pill-link" href="/account">Account</a>
+        <a class="pill pill-link" href="/">Back to tracker</a>
+      </div>
+    </header>
+
+    <main class="account-layout" id="main" aria-busy="true">
+      <h1 class="account-title">Emergency contacts and SOS</h1>
+      <p class="notice" id="notice" role="status" hidden></p>
+
+      <section class="card account-wide emergency-112" aria-labelledby="call-heading">
+        <h2 id="call-heading">In immediate danger? <a href="tel:112">Call 112</a></h2>
+        <p>
+          Safe Location alerts the trusted contacts you choose. It does <strong>not</strong> contact the police,
+          ambulance or any emergency service. 112 is Nigeria's emergency number.
+        </p>
+        <p class="mode-banner" id="mode-banner">Checking how alerts are sent…</p>
+      </section>
+
+      <section class="card account-wide sos-active-card" id="active-card" aria-labelledby="active-heading" hidden>
+        <div class="card-heading"><h2 id="active-heading">SOS active</h2></div>
+        <p id="active-summary"></p>
+        <ul class="row-list" id="active-notifications"></ul>
+        <div class="inline-actions">
+          <button class="button button-secondary" type="button" data-cancel="safe-now">I'm safe now</button>
+          <button class="button button-secondary" type="button" data-cancel="false-alarm">It was a false alarm</button>
+        </div>
+        <p class="field-help">Cancelling stops alerts that haven't gone out yet, and tells contacts who were already alerted that you're safe.</p>
+      </section>
+
+      <div class="sheet">
+      <section class="sheet-section" aria-labelledby="contacts-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="contacts-heading">Trusted contacts</h2>
+            <p class="card-hint">People alerted when you send an SOS (up to 10). Only you can see this list.</p>
+          </div>
+          <button class="button button-primary" id="add-contact" type="button">Add contact</button>
+        </div>
+        <ul class="row-list" id="contact-list"></ul>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="prefs-heading">
+        <div class="card-heading"><h2 id="prefs-heading">What your contacts receive</h2></div>
+        <form id="prefs-form" novalidate>
+          <label class="check">
+            <input id="pref-location" type="checkbox" />
+            <span>Include my location in SOS alerts</span>
+          </label>
+          <div class="field">
+            <label for="pref-note">Personal note added to every alert (optional)</label>
+            <textarea id="pref-note" maxlength="200" rows="3" aria-describedby="pref-note-help"></textarea>
+            <p class="field-help" id="pref-note-help">For example a medical condition or how to reach you. Up to 200 characters. Don't put passwords here.</p>
+          </div>
+          <button class="button button-secondary" type="submit">Save</button>
+        </form>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="preview-heading">
+        <div class="card-heading"><h2 id="preview-heading">Message preview</h2></div>
+        <p class="field-help">This is the text your contacts get (shown here with an example location).</p>
+        <p class="message-preview" id="preview">Loading…</p>
+      </section>
+      </div>
+
+      <div class="sheet">
+      <section class="sheet-section" aria-labelledby="history-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="history-heading">SOS history</h2>
+            <p class="card-hint">Every SOS you sent, with what happened to each message. Kept until you delete your account.</p>
+          </div>
+        </div>
+        <ul class="row-list" id="event-list"></ul>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="audit-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="audit-heading">Emergency activity log</h2>
+            <p class="card-hint">Changes to contacts and settings, SOS alerts and cancellations, and failed messages. Newest first.</p>
+          </div>
+        </div>
+        <ul class="row-list" id="audit-list"></ul>
+      </section>
+      </div>
+    </main>
+
+    <dialog class="dialog" id="contact-dialog" aria-labelledby="contact-title">
+      <form id="contact-form" novalidate>
+        <h2 id="contact-title">Add a trusted contact</h2>
+        <p class="notice" id="contact-error" role="alert" hidden></p>
+        <div class="field">
+          <label for="contact-name">Name</label>
+          <input id="contact-name" type="text" maxlength="80" required autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="contact-relationship">Relationship (optional)</label>
+          <input id="contact-relationship" type="text" maxlength="40" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="contact-phone">Mobile number for SMS</label>
+          <input id="contact-phone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" aria-describedby="contact-phone-help" />
+          <p class="field-help" id="contact-phone-help">Nigerian numbers like 0803 123 4567 are saved as +234 803 123 4567. Other countries: start with + and the country code.</p>
+        </div>
+        <div class="field">
+          <label for="contact-email">Email (optional)</label>
+          <input id="contact-email" type="email" maxlength="254" autocomplete="off" />
+        </div>
+        <label class="check">
+          <input id="contact-notify" type="checkbox" checked />
+          <span>Alert this person when I send an SOS</span>
+        </label>
+        <p class="field-help">Tell this person you've added them, so an alert doesn't come as a surprise.</p>
+        <div class="dialog-actions">
+          <button class="button button-secondary" type="button" id="contact-cancel">Cancel</button>
+          <button class="button button-primary" type="submit">Save contact</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/emergency.js"></script>
+  </body>
+</html>

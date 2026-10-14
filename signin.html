@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a14" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Sign in · Safe Location</title>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="auth-body" data-page="signin">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Safe Location tracker">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+    </header>
+    <main class="auth-main" id="main">
+      <section class="card auth-card" aria-labelledby="auth-heading">
+        <h1 id="auth-heading">Sign in</h1>
+        <p class="auth-lead">Back up your location history and manage your devices.</p>
+        <p class="notice" id="notice" role="status" hidden></p>
+        <form id="auth-form" novalidate>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input id="password" name="password" type="password" autocomplete="current-password" required minlength="10" maxlength="128" />
+              <button class="toggle-password" type="button" aria-controls="password" aria-pressed="false">Show</button>
+            </div>
+          </div>
+          <label class="check">
+            <input id="remember" type="checkbox" checked />
+            <span>Keep me signed in on this device</span>
+          </label>
+          <button class="button button-primary" type="submit">Sign in</button>
+        </form>
+        <p class="auth-alt"><a href="/forgot-password">Forgot your password?</a></p>
+        <p class="auth-alt">New to Safe Location? <a href="/signup">Create an account</a> or <a href="/welcome">see how it works</a></p>
+        <p class="dev-hint" id="dev-hint" hidden>
+          Development mode: emails are not really sent. Open the newest file in the project's
+          <code>data/dev-outbox</code> folder to find the link.
+        </p>
+      </section>
+    </main>
+    <script src="/auth-pages.js"></script>
+  </body>
+</html>

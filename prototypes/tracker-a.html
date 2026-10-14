@@ -1,0 +1,783 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Safe Location Map-first Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a phone-sized app (full-screen map, floating status, swipe-up sheet) with a demo panel beside it.
+   Single deliberate dark world: Violet night, from the Safe Location design system. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0a14; --surface: #15131f; --raised: #1d1a2b; --sheet: #17141f;
+  --border: #2a2640; --border-strong: #3b3557; --control: #7a7299;
+  --text: #eeeaf7; --muted: #b0a9c6; --faint: #8d86a6;
+  --accent: #8b5cf6; --accent-strong: #7c3aed; --accent-text: #c4b5fd; --glow: #e879f9;
+  --warning: #f5b544; --danger: #f87171; --danger-strong: #dc2626; --success: #34d399;
+  --map: #16132a; --water: #1c1938; --street: rgb(176 169 198 / 0.12); --road: rgb(196 181 253 / 0.2);
+  --font: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0; padding-block: 24px; padding-inline: 16px;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% -5%, rgb(139 92 246 / 0.22), transparent 70%),
+    radial-gradient(ellipse 30% 30% at 85% 0%, rgb(232 121 249 / 0.08), transparent 70%),
+    var(--bg);
+  color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 28px; max-width: 1100px; margin: 0 auto; }
+
+/* ---------- Phone frame ---------- */
+.phone {
+  position: relative; flex: 0 0 auto;
+  width: min(390px, 100%); height: min(800px, calc(100svh - 48px)); min-height: 620px;
+  border-radius: 44px; padding: 10px;
+  background: linear-gradient(160deg, #241f3a, #100e19 60%);
+  border: 1px solid rgb(196 181 253 / 0.16);
+  box-shadow: 0 40px 90px -40px rgb(0 0 0 / 0.9), inset 0 1px 0 rgb(255 255 255 / 0.07);
+}
+.screen { position: relative; height: 100%; overflow: hidden; border-radius: 35px; background: var(--map); isolation: isolate; }
+@media (max-width: 480px) {
+  body { padding-block: 0 16px; padding-inline: 0; }
+  .phone { width: 100%; height: 100svh; min-height: 560px; border-radius: 0; padding: 0; border: 0; box-shadow: none; }
+  .screen { border-radius: 0; }
+  .panel { margin-inline: 16px; }
+}
+
+/* ---------- Map ---------- */
+.map { position: absolute; inset: 0; touch-action: none; cursor: grab; }
+.map:active { cursor: grabbing; }
+.map svg { width: 100%; height: 100%; display: block; }
+.street { stroke: var(--street); stroke-width: 9; stroke-linecap: round; fill: none; }
+.road { stroke: var(--road); stroke-width: 16; stroke-linecap: round; fill: none; }
+.maplabel { fill: rgb(176 169 198 / 0.55); font: 600 15px var(--font); letter-spacing: 0.04em; }
+.waterlabel { fill: rgb(196 181 253 / 0.35); font: italic 500 16px var(--font); letter-spacing: 0.08em; }
+.route { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgb(139 92 246 / 0.6)); }
+.route.offline-seg { stroke: var(--warning); stroke-dasharray: 2 12; filter: none; }
+.you-ring { fill: none; stroke: var(--accent); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: ping 2.4s var(--ease) infinite; }
+.you-ring.r2 { animation-delay: 1.2s; }
+@keyframes ping { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(3.4); } }
+.idle .you-ring { display: none; }
+.map-attrib { position: absolute; left: 12px; bottom: 6px; z-index: 1; font-size: 10px; color: var(--faint); pointer-events: none; }
+
+/* ---------- Top bar ---------- */
+.topbar { position: absolute; top: 14px; left: 12px; right: 12px; z-index: 5; display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  position: relative; display: grid; place-items: center; flex: 0 0 auto;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--border-strong); background: rgb(21 19 31 / 0.88);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: var(--accent-text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#shield { background: var(--accent-strong); border-color: rgb(196 181 253 / 0.35); }
+#shield svg.logo { width: 30px; height: 30px; stroke: none; fill: none; }
+.hold-ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); pointer-events: none; }
+.hold-ring circle { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 151; stroke-dashoffset: 151; }
+.status-pill {
+  --tone: var(--faint); --tone-text: var(--muted); --tone-edge: var(--border-strong);
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 9px;
+  height: 44px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--tone-edge); background: rgb(21 19 31 / 0.88); color: var(--tone-text);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  font-size: 13.5px; font-weight: 600; text-align: left;
+  transition: border-color 400ms var(--ease), color 400ms var(--ease);
+}
+.status-pill[data-tone="calm"] { --tone: var(--accent); --tone-text: var(--accent-text); --tone-edge: rgb(139 92 246 / 0.55); }
+.status-pill[data-tone="attention"] { --tone: var(--warning); --tone-text: var(--warning); --tone-edge: rgb(245 181 68 / 0.55); }
+.status-pill[data-tone="alert"] { --tone: var(--danger); --tone-text: #ffc4c4; --tone-edge: var(--danger); }
+.status-pill span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pill-dot { position: relative; flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; background: var(--tone); }
+.status-pill[data-tone="calm"] .pill-dot::after { content: ""; position: absolute; inset: -4px; border: 2px solid var(--tone); border-radius: 50%; animation: breathe 2.4s var(--ease) infinite; }
+@keyframes breathe { from { opacity: 0.7; transform: scale(0.6); } to { opacity: 0; transform: scale(1.7); } }
+.avatar { font-size: 13px; font-weight: 600; color: var(--text); }
+
+/* ---------- Floating map buttons ---------- */
+.fab-col { position: absolute; right: 12px; z-index: 4; display: grid; gap: 10px; justify-items: end; transition: bottom 450ms var(--ease); }
+.sos-fab {
+  display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%;
+  border: 0; background: radial-gradient(circle at 35% 30%, #ef4444, var(--danger-strong) 70%); color: #fff;
+  font-size: 18px; font-weight: 800; letter-spacing: 0.06em;
+  box-shadow: 0 14px 30px -10px rgb(220 38 38 / 0.9), inset 0 2px 0 rgb(255 255 255 / 0.22), 0 0 0 5px rgb(220 38 38 / 0.18);
+  transition: transform 150ms var(--ease);
+}
+.sos-fab:active { transform: scale(0.94); }
+.locate-btn svg { stroke: var(--text); }
+
+/* ---------- Bottom sheet ---------- */
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 6;
+  height: 90%; display: flex; flex-direction: column;
+  border-radius: 26px 26px 0 0; border-top: 1px solid var(--border-strong);
+  background: linear-gradient(180deg, rgb(196 181 253 / 0.05), transparent 160px), var(--sheet);
+  box-shadow: 0 -20px 40px -20px rgb(0 0 0 / 0.7);
+  transition: transform 450ms var(--ease);
+  will-change: transform;
+}
+.sheet.dragging { transition: none; }
+.grab { flex: 0 0 auto; display: grid; place-items: center; height: 26px; border: 0; background: none; touch-action: none; cursor: grab; }
+.grab span { width: 40px; height: 5px; border-radius: 3px; background: var(--border-strong); }
+.sheet-body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 0 18px 28px; scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.state { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.next { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sub { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; }
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; padding: 0 16px; border-radius: 14px; border: 1px solid transparent;
+  font-size: 15px; font-weight: 600; transition: background-color 150ms ease, border-color 150ms ease, transform 120ms ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { background: var(--accent-strong); color: #fff; box-shadow: 0 10px 24px -12px rgb(124 58 237 / 0.9), inset 0 1px 0 rgb(255 255 255 / 0.16); }
+.btn-primary:hover { background: #6d28d9; }
+.btn-secondary { background: var(--raised); border-color: var(--border-strong); }
+.btn-secondary:hover { border-color: var(--accent); }
+.btn-danger { background: var(--danger-strong); color: #fff; }
+.btn-ghost-danger { background: none; border-color: var(--border); color: var(--danger); }
+.btn-wide { grid-column: 1 / -1; width: 100%; }
+
+.readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--border); overflow: hidden; }
+.readout { padding: 10px 12px; background: var(--surface); }
+.readout dt { color: var(--muted); font-size: 11.5px; font-weight: 600; }
+.readout dd { display: flex; align-items: center; gap: 7px; margin: 3px 0 0; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.d { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: var(--faint); }
+.d.ok { background: var(--success); } .d.on { background: var(--accent); } .d.warn { background: var(--warning); }
+dd.warn { color: var(--warning); }
+
+.section { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+.section h3 { margin: 0 0 10px; font-size: 16px; font-weight: 650; letter-spacing: -0.01em; display: flex; justify-content: space-between; align-items: baseline; }
+.section h3 small { color: var(--faint); font-size: 12px; font-weight: 500; }
+.muted { color: var(--muted); font-size: 13.5px; margin: 0; }
+
+.trip-card { padding: 14px; border: 1px solid rgb(139 92 246 / 0.4); border-radius: 16px; background: rgb(139 92 246 / 0.08); }
+.trip-card .route-line { font-weight: 650; font-size: 15px; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; border: 1px solid; }
+.badge.active { color: #8ef0c9; border-color: rgb(52 211 153 / 0.45); background: rgb(52 211 153 / 0.1); }
+.badge.warn { color: var(--warning); border-color: rgb(245 181 68 / 0.45); background: rgb(245 181 68 / 0.1); }
+.kv { display: grid; gap: 6px; margin: 10px 0 12px; font-size: 13.5px; }
+.kv div { display: flex; justify-content: space-between; gap: 12px; }
+.kv span:first-child { color: var(--muted); }
+.kv span:last-child { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+
+.history { list-style: none; margin: 0; padding: 0; }
+.history li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.history li:last-child { border-bottom: 0; }
+.history .t { font-weight: 600; }
+.history .c { color: var(--muted); }
+.chip { padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; border: 1px solid var(--border-strong); color: var(--muted); white-space: nowrap; }
+.chip.ok { color: #8ef0c9; border-color: rgb(52 211 153 / 0.4); }
+.chip.wait { color: var(--warning); border-color: rgb(245 181 68 / 0.45); }
+
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); }
+.seg button { min-height: 40px; border: 0; border-radius: 9px; background: none; color: var(--muted); font-size: 13.5px; font-weight: 600; }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--text); box-shadow: 0 0 0 1px var(--control); }
+
+.contact { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.contact:last-child { border-bottom: 0; }
+.initials { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--raised); border: 1px solid var(--border-strong); font-size: 13px; font-weight: 600; }
+.contact .name { font-weight: 600; }
+.contact .via { color: var(--muted); font-size: 12.5px; }
+.tip { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); margin-bottom: 10px; font-size: 13.5px; }
+.tip svg { flex: 0 0 auto; width: 22px; height: 22px; fill: none; stroke: var(--accent-text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; margin-top: 1px; }
+.tip b { display: block; margin-bottom: 2px; }
+
+/* form */
+.field { display: grid; gap: 6px; margin-top: 12px; }
+.field label { color: var(--muted); font-size: 12.5px; font-weight: 600; }
+.field input, .field select { min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--control); background: var(--raised); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--raised); font-size: 13.5px; font-weight: 600; }
+.chips button[aria-pressed="true"] { border-color: var(--accent); background: rgb(139 92 246 / 0.16); color: var(--accent-text); }
+
+/* ---------- Overlays (inside the phone) ---------- */
+.overlay { position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; justify-content: flex-end; background: rgb(8 6 16 / 0.7); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: fade 250ms var(--ease); }
+@keyframes fade { from { opacity: 0; } }
+.modal { margin: 0; padding: 22px 20px 26px; border-radius: 26px 26px 0 0; background: var(--sheet); border-top: 1px solid var(--border-strong); animation: up 380ms var(--ease); }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } }
+.modal h2 { margin: 0 0 4px; font-size: 21px; letter-spacing: -0.02em; }
+
+.sos-screen { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at 50% 40%, rgb(220 38 38 / 0.45), rgb(8 6 16 / 0.92) 70%); padding: 24px; }
+.count-ring { position: relative; width: 190px; height: 190px; margin: 0 auto 18px; }
+.count-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.count-ring circle { fill: none; stroke-width: 8; }
+.count-ring .bg { stroke: rgb(255 255 255 / 0.12); }
+.count-ring .fg { stroke: #fff; stroke-linecap: round; stroke-dasharray: 565; transition: stroke-dashoffset 1s linear; }
+.count-num { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sos-screen h2 { margin: 0; font-size: 22px; }
+.sos-screen p { margin: 8px auto 20px; max-width: 280px; color: #f3d0d0; font-size: 14px; }
+.sos-screen .row { display: grid; gap: 10px; width: 100%; max-width: 300px; margin: 0 auto; }
+
+.sos-active-list { list-style: none; margin: 12px 0 14px; padding: 0; display: grid; gap: 8px; }
+.sos-active-list li { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); font-size: 13.5px; }
+.sos-active-list .st { color: var(--muted); font-size: 12.5px; }
+
+.pin-dots { display: flex; justify-content: center; gap: 14px; margin: 18px 0; }
+.pin-dots span { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--control); transition: background-color 120ms; }
+.pin-dots span.f { background: var(--accent-text); border-color: var(--accent-text); }
+.pin-dots.shake { animation: shake 360ms; }
+@keyframes shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.keypad button { min-height: 56px; border-radius: 16px; border: 1px solid var(--border-strong); background: var(--raised); font-size: 22px; font-weight: 600; }
+.keypad button:active { background: var(--border-strong); }
+.pin-error { min-height: 20px; margin: 0 0 6px; color: var(--danger); font-size: 13px; text-align: center; }
+
+.inner-toast { position: absolute; left: 50%; top: 70px; z-index: 30; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 9px 14px; border-radius: 12px; background: rgb(29 26 43 / 0.96); border: 1px solid var(--border-strong); font-size: 13px; font-weight: 600; animation: up 300ms var(--ease); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- Demo panel ---------- */
+.panel { flex: 1 1 300px; max-width: 360px; display: grid; gap: 14px; }
+.panel h1 { margin: 0; font-size: 24px; letter-spacing: -0.03em; line-height: 1.15; text-wrap: balance; }
+.panel p { margin: 0; color: var(--muted); font-size: 14px; }
+.card { padding: 16px; border-radius: 18px; border: 1px solid var(--border); background: rgb(21 19 31 / 0.85); }
+.card h2 { margin: 0 0 10px; font-size: 14px; font-weight: 650; color: var(--text); }
+.try { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; display: grid; gap: 6px; }
+.try b { color: var(--text); font-weight: 600; }
+.demo-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.demo-btns button { min-height: 42px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--raised); font-size: 13px; font-weight: 600; }
+.demo-btns button:hover { border-color: var(--accent); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 230px; overflow-y: auto; font-size: 12.5px; color: var(--muted); }
+.log li { padding-left: 12px; border-left: 1px solid var(--border-strong); }
+.log li b { color: var(--accent-text); font-weight: 600; }
+.log li.hidden-alert b { color: var(--glow); }
+.pins { display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.pins span { padding: 4px 10px; border-radius: 8px; background: var(--raised); border: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="stage">
+  <div class="phone">
+    <div class="screen idle" id="screen">
+      <div class="map" id="map" aria-label="Map of your route (simulated)" role="img">
+        <svg id="mapsvg" viewBox="0 0 800 1300" preserveAspectRatio="xMidYMid slice">
+          <g id="world">
+            <rect x="-400" y="-400" width="1600" height="2100" fill="var(--map)" />
+            <path d="M-400 1080 C 0 1040, 220 1130, 420 1080 S 820 960, 1200 1010 L 1200 1700 L -400 1700 Z" fill="var(--water)" />
+            <path d="M560 -400 C 600 0, 760 240, 1200 300 L 1200 -400 Z" fill="var(--water)" />
+            <g id="streets"></g>
+            <path class="road" d="M120 -200 C 180 300, 220 700, 260 1060" />
+            <path class="road" d="M-200 760 C 200 700, 520 560, 1100 420" />
+            <path class="road" d="M300 1060 C 420 900, 560 760, 760 520 S 900 260, 1000 120" />
+            <text class="maplabel" x="150" y="640">YABA</text>
+            <text class="maplabel" x="40" y="380">EBUTE METTA</text>
+            <text class="maplabel" x="560" y="640">IKOYI</text>
+            <text class="maplabel" x="620" y="380">LEKKI PHASE 1</text>
+            <text class="waterlabel" x="300" y="1180">Lagos Lagoon</text>
+            <path id="route" class="route" d="" />
+            <path id="route-off" class="route offline-seg" d="" />
+            <circle id="start" r="9" fill="var(--bg)" stroke="var(--success)" stroke-width="5" cx="-100" cy="-100" />
+            <g id="you" transform="translate(260 900)">
+              <circle class="you-ring" r="12" />
+              <circle class="you-ring r2" r="12" />
+              <circle r="13" fill="var(--accent)" stroke="#fff" stroke-width="4" />
+            </g>
+          </g>
+        </svg>
+        <span class="map-attrib">Illustrative map · simulated data</span>
+      </div>
+
+      <div class="topbar">
+        <button class="icon-btn" id="shield" aria-label="Safe Location. Press and hold the logo for 3 seconds to send a silent SOS">
+          <svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g></svg>
+          <svg class="hold-ring" viewBox="0 0 52 52" aria-hidden="true"><circle id="holdc" cx="26" cy="26" r="24" /></svg>
+        </button>
+        <button class="status-pill" id="pill" data-tone="idle" aria-live="polite"><span class="pill-dot" aria-hidden="true"></span><span id="pill-text">Not recording</span></button>
+        <button class="icon-btn avatar" id="avatar" aria-label="Account: Amara Okafor">AO</button>
+      </div>
+
+      <div class="fab-col" id="fabs">
+        <button class="icon-btn locate-btn" id="locate" aria-label="Recenter on your position">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5" /><circle cx="12" cy="12" r="1.6" /><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" /></svg>
+        </button>
+        <button class="sos-fab" id="sos" aria-label="Send SOS">SOS</button>
+      </div>
+
+      <section class="sheet" id="sheet" aria-label="Tracker details">
+        <button class="grab" id="grab" aria-label="Expand or collapse details"><span></span></button>
+        <div class="sheet-body" id="sheet-body"></div>
+      </section>
+
+      <div id="overlay-root"></div>
+    </div>
+  </div>
+
+  <aside class="panel" aria-label="About this prototype">
+    <div>
+      <h1>Layout A: map first, everything one swipe away</h1>
+      <p style="margin-top:8px">A clickable prototype of the simplified Safe Location tracker. Everything runs in this page with simulated data: no real location, no real messages. One minute of tracking passes in 5 seconds.</p>
+    </div>
+    <div class="card">
+      <h2>Things to try</h2>
+      <ol class="try">
+        <li><b>Start tracking</b>, then drag the sheet up and down</li>
+        <li><b>Start a trip</b> to Lekki with trusted contacts</li>
+        <li><b>Tap SOS</b>: a 5-second countdown you can cancel</li>
+        <li><b>Hold the logo</b> (top left) for 3 seconds: silent SOS</li>
+        <li><b>Cancel an SOS</b> with the safety PIN, or the duress PIN</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>Demo PINs</h2>
+      <div class="pins"><span>Safety PIN 1234</span><span>Duress PIN 9999</span></div>
+      <p style="margin-top:8px;font-size:12.5px">The duress PIN looks exactly like a normal cancel, but silently alerts your contacts.</p>
+    </div>
+    <div class="card">
+      <h2>Simulate</h2>
+      <div class="demo-btns">
+        <button id="d-offline">Go offline</button>
+        <button id="d-checkin">Missed check-in</button>
+        <button id="d-gps">Weak GPS</button>
+        <button id="d-reset">Reset demo</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>What happened behind the scenes</h2>
+      <ul class="log" id="log"><li>Prototype loaded. Nothing has been sent.</li></ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const MIN = 5000; // one "minute" in this demo
+
+  // ---------- Map: minor streets ----------
+  const streets = $("#streets");
+  let s = "";
+  for (let i = -6; i < 22; i++) s += `<path class="street" d="M${i * 70 - 300} -400 L${i * 70 + 60} 1700" />`;
+  for (let j = -4; j < 26; j++) s += `<path class="street" d="M-400 ${j * 80} L1200 ${j * 80 - 220}" />`;
+  streets.innerHTML = s;
+
+  const WAY = [[260,900],[285,872],[310,850],[338,826],[372,806],[402,778],[430,742],[458,712],[490,680],[522,646],[552,612],[580,578],[610,548],[640,514],[668,482],[694,452],[720,424],[742,398]];
+
+  // ---------- State ----------
+  const st = {
+    tracking: false, interval: 1, next: 60, points: [], offlineFrom: null,
+    online: true, weakGps: false, trip: null, sos: null, sheet: "peek",
+    pending: 0, silentSent: false
+  };
+  const contacts = [
+    { id: "mum", name: "Mum", init: "M", via: "WhatsApp" },
+    { id: "tunde", name: "Tunde", init: "T", via: "SMS" },
+    { id: "ada", name: "Ada", init: "A", via: "Email" }
+  ];
+
+  // ---------- Helpers ----------
+  const now = () => new Date();
+  const hhmm = (d) => d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const hm24 = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  const log = (html, hidden) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${hidden ? "" : ""}${html}`;
+    if (hidden) li.className = "hidden-alert";
+    $("#log").prepend(li);
+  };
+  const vibrate = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch {} };
+  let toastTimer;
+  const toast = (text) => {
+    document.querySelectorAll(".inner-toast").forEach((n) => n.remove());
+    const t = document.createElement("div");
+    t.className = "inner-toast"; t.setAttribute("role", "status"); t.textContent = text;
+    $("#screen").append(t);
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.remove(), 2600);
+  };
+
+  // ---------- Map pan ----------
+  let pan = { x: 0, y: 0 };
+  const world = $("#world");
+  const applyPan = () => world.setAttribute("transform", `translate(${pan.x} ${pan.y})`);
+  const centerOn = ([x, y]) => { pan = { x: 400 - x, y: 560 - y }; world.style.transition = reduce ? "" : "transform 600ms cubic-bezier(.16,1,.3,1)"; applyPan(); setTimeout(() => (world.style.transition = ""), 650); };
+  (() => {
+    const map = $("#map"); let start = null;
+    map.addEventListener("pointerdown", (e) => { start = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y }; map.setPointerCapture(e.pointerId); });
+    map.addEventListener("pointermove", (e) => {
+      if (!start) return;
+      const m = $("#mapsvg").getScreenCTM(); const k = m ? 1 / m.a : 1;
+      pan.x = start.px + (e.clientX - start.x) * k; pan.y = start.py + (e.clientY - start.y) * k; applyPan();
+    });
+    map.addEventListener("pointerup", () => (start = null));
+  })();
+  $("#locate").addEventListener("click", () => centerOn(lastPos()));
+  const lastPos = () => (st.points.length ? st.points[st.points.length - 1].xy : WAY[0]);
+
+  function drawRoute() {
+    const on = st.points.filter((p) => !p.offline || p.synced);
+    const pts = st.points.map((p) => p.xy);
+    $("#route").setAttribute("d", pts.length > 1 ? "M" + pts.map((p) => p.join(" ")).join(" L") : "");
+    const offIdx = st.points.findIndex((p) => p.offline && !p.synced);
+    const off = offIdx >= 0 ? st.points.slice(Math.max(0, offIdx - 1)).map((p) => p.xy) : [];
+    $("#route-off").setAttribute("d", off.length > 1 ? "M" + off.map((p) => p.join(" ")).join(" L") : "");
+    const p = lastPos();
+    $("#you").setAttribute("transform", `translate(${p[0]} ${p[1]})`);
+    if (st.points.length) { $("#start").setAttribute("cx", st.points[0].xy[0]); $("#start").setAttribute("cy", st.points[0].xy[1]); }
+    else { $("#start").setAttribute("cx", -100); }
+    void on;
+  }
+
+  // ---------- Tracking simulation ----------
+  let ticker = null;
+  function takeReading() {
+    const i = Math.min(st.points.length, WAY.length - 1);
+    const [x, y] = WAY[i];
+    const acc = st.weakGps ? 68 : 8 + Math.round(Math.random() * 9);
+    st.points.push({ xy: [x + (Math.random() * 6 - 3), y + (Math.random() * 6 - 3)], at: now(), acc, offline: !st.online, synced: st.online });
+    if (!st.online) st.pending++;
+    st.next = st.interval * 60;
+    drawRoute();
+    if (st.sheet === "peek" && st.points.length === 1) centerOn(lastPos());
+  }
+  function tick() {
+    st.next -= 60 / (MIN / 1000); // 12 "seconds" per real second
+    if (st.next <= 0) takeReading();
+    render();
+  }
+  function startTracking(silentMsg) {
+    if (st.tracking) return;
+    st.tracking = true; st.next = 0; takeReading();
+    clearInterval(ticker); ticker = setInterval(tick, 1000);
+    $("#screen").classList.remove("idle");
+    if (!silentMsg) log(`<b>Tracking started.</b> First point saved on this phone${st.online ? " and uploaded" : ""}.`);
+    render();
+  }
+  function stopTracking() {
+    st.tracking = false; clearInterval(ticker);
+    $("#screen").classList.add("idle");
+    log("<b>Tracking stopped.</b> Points are kept.");
+    render();
+  }
+
+  // ---------- Status (one sentence, one tone) ----------
+  function condition() {
+    if (st.sos && st.sos.phase === "active") return ["alert", "SOS active: contacts are being alerted"];
+    if (st.trip && st.trip.checkin) return ["alert", "Check-in requested: are you OK?"];
+    if (st.tracking && !st.online) return ["attention", `Offline · ${st.pending} point${st.pending === 1 ? "" : "s"} waiting on this phone`];
+    if (st.tracking && st.weakGps) return ["attention", "Recording, but GPS is weak (±68 m)"];
+    if (st.trip && st.tracking) return ["calm", `Trip to ${st.trip.to} · recording every ${st.interval} min`];
+    if (st.tracking) return ["calm", `Recording · every ${st.interval} min`];
+    return ["idle", "Not recording"];
+  }
+
+  // ---------- Sheet ----------
+  const sheet = $("#sheet");
+  const SNAP = { peek: 0, half: 0, full: 0 };
+  function measure() {
+    const H = $("#screen").clientHeight, h = sheet.clientHeight;
+    SNAP.full = 0;
+    SNAP.half = h - H * 0.56;
+    SNAP.peek = h - (st.tracking || st.trip ? 236 : 222);
+  }
+  function snap(name) {
+    st.sheet = name; measure();
+    if (name === "peek") $("#sheet-body").scrollTop = 0;
+    sheet.style.transform = `translateY(${SNAP[name]}px)`;
+    const visible = sheet.clientHeight - SNAP[name];
+    $("#fabs").style.bottom = `${Math.min(visible, $("#screen").clientHeight * 0.6) + 14}px`;
+    $("#fabs").style.opacity = name === "full" ? "0" : "1";
+    $("#fabs").style.pointerEvents = name === "full" ? "none" : "";
+    $("#grab").setAttribute("aria-expanded", String(name !== "peek"));
+  }
+  (() => {
+    const grab = $("#grab"); let d = null;
+    grab.addEventListener("pointerdown", (e) => { measure(); d = { y: e.clientY, base: SNAP[st.sheet], moved: false }; grab.setPointerCapture(e.pointerId); sheet.classList.add("dragging"); });
+    grab.addEventListener("pointermove", (e) => {
+      if (!d) return; const dy = e.clientY - d.y; if (Math.abs(dy) > 4) d.moved = true;
+      sheet.style.transform = `translateY(${Math.max(0, Math.min(SNAP.peek, d.base + dy))}px)`;
+    });
+    grab.addEventListener("pointerup", (e) => {
+      if (!d) return; sheet.classList.remove("dragging");
+      if (!d.moved) { snap(st.sheet === "peek" ? "half" : st.sheet === "half" ? "full" : "peek"); d = null; return; }
+      const y = d.base + (e.clientY - d.y);
+      const order = ["full", "half", "peek"];
+      snap(order.reduce((best, n) => (Math.abs(SNAP[n] - y) < Math.abs(SNAP[best] - y) ? n : best), "peek"));
+      d = null;
+    });
+    $("#pill").addEventListener("click", () => snap(st.sheet === "peek" ? "half" : "peek"));
+    addEventListener("resize", () => snap(st.sheet));
+  })();
+
+  // ---------- Render ----------
+  const ico = {
+    play: '<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5L8 5.5Z" fill="currentColor" stroke="none"/></svg>',
+    stop: '<svg viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor" stroke="none"/></svg>',
+    trip: '<svg viewBox="0 0 24 24"><path d="M5 19c3-1 4-4 7-7s5-5 7-5M15 7h4v4"/></svg>',
+    hold: '<svg viewBox="0 0 24 24"><path d="M12 2.8 19.5 6v5.4c0 4.6-3.1 8.6-7.5 10-4.4-1.4-7.5-5.4-7.5-10V6L12 2.8Z"/></svg>',
+    pin: '<svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>',
+    wa: '<svg viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>'
+  };
+  let formOpen = false;
+
+  function render() {
+    const [tone, text] = condition();
+    const pill = $("#pill");
+    if (pill.dataset.tone !== tone) pill.dataset.tone = tone;
+    if ($("#pill-text").textContent !== text) $("#pill-text").textContent = text;
+
+    const last = st.points[st.points.length - 1];
+    const secs = Math.max(0, Math.round(st.next));
+    const next = st.tracking ? `Next point in ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}` : "Stopped";
+    const waiting = st.points.filter((p) => !p.synced).length;
+    const gps = !st.tracking ? ["Not tracking", ""] : st.weakGps ? ["±68 m · weak", "warn"] : last ? [`±${last.acc} m · now`, "ok"] : ["Waiting…", "on"];
+    const conn = st.online ? ["Online", "ok"] : ["Offline", "warn"];
+    const backup = waiting ? [`${waiting} waiting`, "warn"] : st.points.length ? ["All uploaded", "ok"] : ["Nothing yet", ""];
+
+    const trip = st.trip;
+    let html = `
+      <div class="head"><p class="state">${st.sos && st.sos.phase === "active" ? "SOS active" : st.tracking ? "Tracking active" : trip ? "Trip paused" : "Not tracking"}</p><span class="next">${next}</span></div>
+      <p class="sub">${st.tracking ? `GPS ${gps[0]} · ${backup[0].toLowerCase()}` : "Start tracking to save your location on this phone."}</p>
+      <div class="actions">
+        ${trip
+          ? `<button class="btn btn-secondary" data-act="pause">${st.tracking ? ico.stop + "Pause" : ico.play + "Resume"}</button><button class="btn btn-primary" data-act="end-trip">End trip</button>`
+          : st.tracking
+            ? `<button class="btn btn-secondary" data-act="stop">${ico.stop}Stop</button><button class="btn btn-primary" data-act="trip-form">${ico.trip}Start a trip</button>`
+            : `<button class="btn btn-primary" data-act="start">${ico.play}Start tracking</button><button class="btn btn-secondary" data-act="trip-form">${ico.trip}Start a trip</button>`}
+      </div>
+      <dl class="readouts">
+        <div class="readout"><dt>GPS</dt><dd class="${gps[1] === "warn" ? "warn" : ""}"><i class="d ${gps[1]}"></i>${gps[0]}</dd></div>
+        <div class="readout"><dt>Connection</dt><dd class="${conn[1] === "warn" ? "warn" : ""}"><i class="d ${conn[1]}"></i>${conn[0]}</dd></div>
+        <div class="readout"><dt>Backup</dt><dd class="${backup[1] === "warn" ? "warn" : ""}"><i class="d ${backup[1]}"></i>${backup[0]}</dd></div>
+        <div class="readout"><dt>${trip ? "Trip" : "Saved here"}</dt><dd>${trip ? (trip.checkin ? "Check-in requested" : st.online ? "Active" : "Offline") : `${st.points.length} point${st.points.length === 1 ? "" : "s"}`}</dd></div>
+      </dl>`;
+
+    if (formOpen) {
+      html += `
+      <div class="section" id="trip-form-sec"><h3>Start a trip</h3>
+        <div class="field"><label for="f-from">From</label><input id="f-from" value="Yaba, my office" /></div>
+        <div class="field"><label for="f-to">To</label><input id="f-to" value="Lekki Phase 1" /></div>
+        <div class="field"><label for="f-eta">Expected arrival</label><input id="f-eta" type="time" value="${hm24(new Date(Date.now() + 40 * 60000))}" /></div>
+        <div class="field"><label>Who should know</label><div class="chips" id="f-contacts">
+          ${contacts.map((c, i) => `<button type="button" aria-pressed="${i < 2}" data-cid="${c.id}">${c.name} · ${c.via}</button>`).join("")}
+        </div></div>
+        <div class="field"><label for="f-esc">If I miss a check-in</label><select id="f-esc"><option>Tell my contacts if I don't answer in 10 min</option><option>Tell my contacts straight away</option><option>Only remind me</option></select></div>
+        <div class="actions"><button class="btn btn-secondary" data-act="form-cancel">Not now</button><button class="btn btn-primary" data-act="trip-start">Start trip</button></div>
+      </div>`;
+    } else if (trip) {
+      const left = Math.round((trip.eta - Date.now()) / 60000);
+      html += `
+      <div class="section"><h3>Trip <small>${trip.from} → ${trip.to}</small></h3>
+        <div class="trip-card">
+          <span class="badge ${trip.checkin || !st.online ? "warn" : "active"}">${trip.checkin ? "Check-in requested" : st.online ? "Active" : "Offline"}</span>
+          <div class="kv">
+            <div><span>Expected arrival</span><span>${hhmm(trip.eta)} (${left >= 0 ? `in ${left} min` : `${-left} min ago`})</span></div>
+            <div><span>Last confirmed location</span><span>${st.points.filter((p) => p.synced).length ? hhmm(st.points.filter((p) => p.synced).slice(-1)[0].at) : "None yet"}</span></div>
+            <div><span>Contacts</span><span>${trip.contacts.map((c) => c.name).join(", ") || "Only you"}</span></div>
+          </div>
+          <button class="btn btn-ghost-danger btn-wide" data-act="cancel-trip">Cancel trip</button>
+        </div>
+      </div>`;
+    }
+
+    html += `
+      <div class="section"><h3>History <small>${st.points.length} point${st.points.length === 1 ? "" : "s"}</small></h3>
+        ${st.points.length ? `<ul class="history">${st.points.slice(-6).reverse().map((p) => `<li><span class="t">${hhmm(p.at)}</span><span class="c">±${p.acc} m</span><span class="chip ${p.synced ? "ok" : "wait"}">${p.synced ? "Uploaded" : "Waiting"}</span></li>`).join("")}</ul>` : `<p class="muted">No points yet. Your route appears on the map as you move.</p>`}
+      </div>
+      <div class="section"><h3>Save a point every</h3>
+        <div class="seg" role="group" aria-label="Recording interval">${[1, 2, 5, 10].map((m) => `<button aria-pressed="${st.interval === m}" data-int="${m}">${m} min</button>`).join("")}</div>
+      </div>
+      <div class="section"><h3>Safety</h3>
+        <div class="tip">${ico.hold}<div><b>Silent SOS</b>Press and hold the logo at the top for 3 seconds. No sound, no countdown, nothing changes on screen.</div></div>
+        <div class="tip">${ico.pin}<div><b>Safety and duress PINs</b>Cancelling an SOS, ending a trip or answering a check-in needs your PIN. The duress PIN looks the same but silently alerts your contacts.</div></div>
+      </div>
+      <div class="section"><h3>Trusted contacts <small>Alerted on SOS</small></h3>
+        ${contacts.map((c) => `<div class="contact"><span class="initials">${c.init}</span><div><div class="name">${c.name}</div><div class="via">${c.via}${c.via === "WhatsApp" ? " · confirmed opt-in" : ""}</div></div></div>`).join("")}
+      </div>
+      <p class="muted" style="margin-top:22px;font-size:12px">Safe Location alerts the people you choose. It does not contact emergency services. In immediate danger, call 112.</p>`;
+
+    const body = $("#sheet-body");
+    const scroll = body.scrollTop;
+    const focusId = document.activeElement && document.activeElement.id;
+    if (body.dataset.html !== html) {
+      body.innerHTML = html; body.dataset.html = html; body.scrollTop = scroll;
+      if (focusId && document.getElementById(focusId)) document.getElementById(focusId).focus();
+    }
+  }
+
+  // ---------- Sheet actions ----------
+  $("#sheet-body").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.int) { st.interval = Number(b.dataset.int); st.next = Math.min(st.next, st.interval * 60); log(`<b>Interval changed</b> to every ${st.interval} min.`); render(); return; }
+    if (b.dataset.cid) { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); return; }
+    const act = b.dataset.act;
+    if (act === "start") { startTracking(); snap("peek"); }
+    if (act === "stop") stopTracking();
+    if (act === "trip-form") { formOpen = true; render(); snap("full"); setTimeout(() => $("#trip-form-sec") && $("#trip-form-sec").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }), 80); }
+    if (act === "form-cancel") { formOpen = false; render(); snap("peek"); }
+    if (act === "trip-start") {
+      const chosen = [...document.querySelectorAll("#f-contacts button[aria-pressed='true']")].map((x) => contacts.find((c) => c.id === x.dataset.cid));
+      const [h, m] = ($("#f-eta").value || "00:00").split(":").map(Number);
+      const eta = new Date(); eta.setHours(h, m, 0, 0); if (eta < Date.now()) eta.setDate(eta.getDate() + 1);
+      st.trip = { from: $("#f-from").value || "Start", to: $("#f-to").value || "Destination", eta, contacts: chosen, checkin: false };
+      formOpen = false;
+      if (!st.tracking) startTracking(true);
+      log(`<b>Trip started</b> to ${st.trip.to}. ${chosen.map((c) => `${c.name} (${c.via})`).join(", ") || "Nobody"} will be told only if a check-in is missed.`);
+      render(); snap("peek"); toast("Trip started");
+    }
+    if (act === "pause") { if (st.tracking) { stopTracking(); toast("Trip paused: not recording"); } else { startTracking(); toast("Trip resumed"); } }
+    if (act === "end-trip") askPin("End trip", "Enter your safety PIN to end the trip.", (duress) => { endTrip("Trip ended", duress); });
+    if (act === "cancel-trip") askPin("Cancel trip", "Enter your safety PIN to cancel the trip.", (duress) => { endTrip("Trip cancelled", duress); });
+  });
+  function endTrip(msg, duress) {
+    const to = st.trip.to; st.trip = null;
+    if (duress) { log(`<b>Duress PIN used to end the trip.</b> The screen shows "${msg}", but tracking continues in the background and ${contacts[0].name} and ${contacts[1].name} were silently alerted (simulated).`, true); }
+    else { if (st.tracking) stopTracking(); log(`<b>${msg}</b> (${to}). Recorded points are kept.`); }
+    // On a duress end the screen must look like a normal end: show "Not tracking" while recording continues.
+    if (duress) { st.hiddenTracking = true; clearInterval(ticker); st.tracking = false; $("#screen").classList.add("idle"); hiddenTicker(); }
+    render(); snap("peek"); toast(msg);
+  }
+  let hidden = null;
+  function hiddenTicker() { clearInterval(hidden); hidden = setInterval(() => { if (!st.hiddenTracking) return clearInterval(hidden); log("<b>Hidden recording:</b> a point was saved and shared with your alerted contacts (simulated).", true); }, MIN * 2); }
+
+  // ---------- SOS ----------
+  const overlay = $("#overlay-root");
+  let countT = null;
+  $("#sos").addEventListener("click", () => {
+    if (st.sos && st.sos.phase === "active") return showSosActive();
+    st.sos = { phase: "countdown", left: 5 };
+    vibrate([60, 40, 60]);
+    overlay.innerHTML = `
+      <div class="overlay sos-screen" role="alertdialog" aria-labelledby="sos-t">
+        <div class="count-ring"><svg viewBox="0 0 200 200" width="190" height="190"><circle class="bg" cx="100" cy="100" r="90"/><circle class="fg" id="cfg" cx="100" cy="100" r="90" stroke-dashoffset="0"/></svg><div class="count-num" id="cnum">5</div></div>
+        <h2 id="sos-t">Sending SOS</h2>
+        <p>Mum (WhatsApp) and Tunde (SMS) will get your location. Cancel now if this was a mistake.</p>
+        <div class="row"><button class="btn btn-secondary" id="sos-cancel">Cancel</button><button class="btn btn-danger" id="sos-now">Send now</button></div>
+      </div>`;
+    $("#sos-cancel").focus();
+    const step = () => {
+      st.sos.left--; $("#cnum").textContent = Math.max(0, st.sos.left);
+      $("#cfg").setAttribute("stroke-dashoffset", String(565 * (1 - st.sos.left / 5)));
+      if (st.sos.left <= 0) sendSos();
+    };
+    clearInterval(countT); countT = setInterval(step, 1000);
+    $("#sos-cancel").onclick = () => { clearInterval(countT); st.sos = null; overlay.innerHTML = ""; log("<b>SOS countdown cancelled.</b> Nothing was sent."); toast("SOS cancelled. Nothing was sent."); render(); };
+    $("#sos-now").onclick = sendSos;
+  });
+  function sendSos() {
+    clearInterval(countT);
+    st.sos = { phase: "active", since: now(), status: { mum: "sending…", tunde: "sending…" } };
+    if (!st.tracking) startTracking(true);
+    vibrate(200);
+    log(`<b>SOS sent</b> to Mum (WhatsApp) and Tunde (SMS) with your location (simulated).`);
+    showSosActive(); render();
+    setTimeout(() => { if (!st.sos) return; st.sos.status = { mum: "sent, waiting for confirmation", tunde: "sent, waiting for confirmation" }; refreshSos(); }, 1200);
+    setTimeout(() => { if (!st.sos) return; st.sos.status.mum = "delivered, confirmed by WhatsApp"; refreshSos(); log("<b>WhatsApp confirmed delivery</b> to Mum."); }, 3200);
+    setTimeout(() => { if (!st.sos) return; st.sos.status.mum = "read, confirmed by WhatsApp"; st.sos.status.tunde = "delivered, confirmed by provider"; refreshSos(); }, 5600);
+  }
+  function showSosActive() {
+    overlay.innerHTML = `
+      <div class="overlay" role="dialog" aria-labelledby="sa-t"><div class="modal" style="border-top-color:var(--danger)">
+        <h2 id="sa-t">SOS active since ${hhmm(st.sos.since)}</h2>
+        <p class="muted">Current location sent (±${(st.points.slice(-1)[0] || { acc: 12 }).acc} m). Your location keeps updating for your contacts.</p>
+        <ul class="sos-active-list" id="sos-list"></ul>
+        <div class="actions"><button class="btn btn-secondary" id="sa-hide">Hide</button><button class="btn btn-primary" id="sa-cancel">I'm safe</button></div>
+        <p class="muted" style="margin-top:12px;font-size:12.5px">Safe Location does not contact emergency services. In immediate danger, call <b>112</b>.</p>
+      </div></div>`;
+    refreshSos();
+    $("#sa-hide").onclick = () => { overlay.innerHTML = ""; };
+    $("#sa-cancel").onclick = () => askPin("Cancel SOS", "Enter your safety PIN to tell your contacts you're safe.", (duress) => {
+      if (duress) { log("<b>Duress PIN used to cancel the SOS.</b> The screen shows the SOS as cancelled, but it stays active: contacts keep getting your location and were told you may be under pressure (simulated).", true); }
+      else log("<b>SOS cancelled.</b> Mum and Tunde were told you're safe (simulated).");
+      st.sos = null; render(); toast("SOS cancelled. Contacts told you're safe.");
+    });
+  }
+  function refreshSos() {
+    const list = $("#sos-list"); if (!list || !st.sos) return;
+    list.innerHTML = `<li><span class="initials">M</span><div><b>Mum</b> · WhatsApp<div class="st">${st.sos.status.mum}</div></div></li><li><span class="initials">T</span><div><b>Tunde</b> · SMS<div class="st">${st.sos.status.tunde}</div></div></li>`;
+  }
+
+  // ---------- PIN pad (safety PIN 1234, duress PIN 9999) ----------
+  function askPin(title, hint, done) {
+    let pin = "";
+    overlay.innerHTML = `
+      <div class="overlay" role="dialog" aria-labelledby="pin-t"><div class="modal">
+        <h2 id="pin-t">${title}</h2><p class="muted">${hint}</p>
+        <div class="pin-dots" id="dots" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <p class="pin-error" id="pin-err" role="alert"></p>
+        <div class="keypad">${[1,2,3,4,5,6,7,8,9].map((n) => `<button data-k="${n}" aria-label="${n}">${n}</button>`).join("")}<button data-k="back" aria-label="Delete">⌫</button><button data-k="0" aria-label="0">0</button><button data-k="close" aria-label="Close" style="font-size:15px">Close</button></div>
+      </div></div>`;
+    const dots = () => document.querySelectorAll("#dots span").forEach((s, i) => s.classList.toggle("f", i < pin.length));
+    overlay.querySelector(".keypad").addEventListener("click", (e) => {
+      const k = e.target.closest("button"); if (!k) return;
+      if (k.dataset.k === "close") { overlay.innerHTML = ""; if (st.sos && st.sos.phase === "active") showSosActive(); return; }
+      if (k.dataset.k === "back") { pin = pin.slice(0, -1); dots(); return; }
+      if (pin.length >= 4) return;
+      pin += k.dataset.k; dots(); $("#pin-err").textContent = "";
+      if (pin.length === 4) setTimeout(() => {
+        if (pin === "1234" || pin === "9999") { overlay.innerHTML = ""; vibrate(30); done(pin === "9999"); }
+        else { $("#dots").classList.remove("shake"); void $("#dots").offsetWidth; $("#dots").classList.add("shake"); $("#pin-err").textContent = "That PIN isn't right. Try again."; pin = ""; dots(); }
+      }, 160);
+    });
+  }
+
+  // ---------- Silent SOS: press and hold the logo for 3 s ----------
+  (() => {
+    const btn = $("#shield"), ring = $("#holdc"); let t0 = 0, raf = 0, fired = false;
+    const reset = () => { cancelAnimationFrame(raf); ring.style.strokeDashoffset = 151; };
+    const loop = () => {
+      const p = Math.min(1, (performance.now() - t0) / 3000);
+      ring.style.strokeDashoffset = String(151 * (1 - p));
+      if (p >= 1 && !fired) {
+        fired = true; reset(); vibrate(25);
+        if (!st.tracking && !st.hiddenTracking) { st.hiddenTracking = true; hiddenTicker(); }
+        log(`<b>Silent SOS sent</b> to Mum (WhatsApp) and Tunde (SMS) with your live location. Nothing changed on screen; only a short vibration confirmed it (simulated).`, true);
+        return;
+      }
+      if (!fired) raf = requestAnimationFrame(loop);
+    };
+    btn.addEventListener("pointerdown", (e) => { e.preventDefault(); fired = false; t0 = performance.now(); raf = requestAnimationFrame(loop); });
+    ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => btn.addEventListener(ev, () => { if (!fired) reset(); }));
+    btn.addEventListener("contextmenu", (e) => e.preventDefault());
+    btn.addEventListener("click", () => { if (!fired && performance.now() - t0 < 400) toast("Hold for 3 seconds to send a silent SOS"); });
+  })();
+
+  $("#avatar").addEventListener("click", () => toast("Account: Amara Okafor · Amara's phone"));
+
+  // ---------- Demo controls ----------
+  $("#d-offline").addEventListener("click", (e) => {
+    st.online = !st.online; e.target.textContent = st.online ? "Go offline" : "Back online";
+    if (st.online) {
+      const n = st.points.filter((p) => !p.synced).length;
+      st.points.forEach((p) => (p.synced = true)); st.pending = 0; drawRoute();
+      log(`<b>Back online.</b> ${n} waiting point${n === 1 ? "" : "s"} uploaded, each exactly once.`); toast(n ? `Back online: ${n} points uploaded` : "Back online");
+    } else { log("<b>Connection lost.</b> New points are saved on this phone and wait to upload."); }
+    render();
+  });
+  $("#d-gps").addEventListener("click", (e) => { st.weakGps = !st.weakGps; e.target.textContent = st.weakGps ? "Strong GPS" : "Weak GPS"; render(); });
+  $("#d-checkin").addEventListener("click", () => {
+    if (!st.trip) { toast("Start a trip first"); return; }
+    st.trip.checkin = true; vibrate([80, 60, 80]);
+    log("<b>The server asked for a check-in:</b> no update for 15 min (simulated).");
+    render();
+    overlay.innerHTML = `
+      <div class="overlay" role="alertdialog" aria-labelledby="ci-t"><div class="modal" style="border-top-color:var(--danger)">
+        <span class="badge warn">Check-in requested</span>
+        <h2 id="ci-t" style="margin-top:10px">Are you OK?</h2>
+        <p class="muted">No location has reached the server for 15 minutes. If you don't answer by ${hhmm(new Date(Date.now() + 10 * 60000))}, ${st.trip.contacts.map((c) => c.name).join(" and ") || "nobody"} will be told.</p>
+        <div class="actions"><button class="btn btn-primary btn-wide" id="ci-ok">I'm OK</button></div>
+      </div></div>`;
+    $("#ci-ok").focus();
+    $("#ci-ok").onclick = () => askPin("Check in", "Enter your safety PIN to confirm you're OK.", (duress) => {
+      st.trip.checkin = false;
+      if (duress) log("<b>Duress PIN used to check in.</b> The screen shows \"Checked in\", but your contacts were silently alerted (simulated).", true);
+      else log("<b>Checked in.</b> Nobody was alerted.");
+      render(); toast("Thanks, you've checked in.");
+    });
+  });
+  $("#d-reset").addEventListener("click", () => location.reload());
+
+  // ---------- Boot ----------
+  centerOn(WAY[0]); render(); requestAnimationFrame(() => snap("peek"));
+})();
+</script>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a14" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Trip history · Safe Location</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="account-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Safe Location tracker">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+      <div class="header-status">
+        <a class="pill pill-link" href="/account">Account</a>
+        <a class="pill pill-link" href="/">Back to tracker</a>
+      </div>
+    </header>
+
+    <main class="account-layout" id="main" aria-busy="true">
+      <h1 class="account-title">Trip history</h1>
+      <p class="notice" id="notice" role="status" hidden></p>
+
+      <section class="card account-wide" id="detail" aria-labelledby="detail-heading" hidden>
+        <div class="card-heading">
+          <div>
+            <h2 id="detail-heading">Trip</h2>
+            <p class="card-hint" id="detail-subtitle"></p>
+          </div>
+          <span class="trip-badge" id="detail-badge"></span>
+        </div>
+        <div class="trip-map-frame">
+          <div id="trip-map" role="region" aria-label="Route of this trip"></div>
+          <p class="map-alert" id="trip-map-note" hidden></p>
+        </div>
+        <dl class="details" id="detail-facts"></dl>
+        <h3 class="subheading">Messages to trip contacts</h3>
+        <ul class="row-list" id="detail-messages"></ul>
+        <div class="inline-actions">
+          <a class="button button-secondary" id="detail-open" href="/" hidden>Open in the tracker</a>
+          <button class="button button-danger-ghost" id="detail-delete" type="button" hidden>Delete this trip</button>
+        </div>
+      </section>
+
+      <section class="card account-wide" aria-labelledby="list-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="list-heading">Your trips</h2>
+            <p class="card-hint">Only you can see these. Times are from the Safe Location server; location times are as reported by your phone.</p>
+          </div>
+        </div>
+        <ul class="row-list" id="trip-list"></ul>
+      </section>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="/trips.js"></script>
+  </body>
+</html>

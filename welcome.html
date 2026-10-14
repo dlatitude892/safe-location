@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Safe Location records your location only while you choose to, backs it up privately, and alerts the people you trust when you press SOS or miss a check-in." />
+    <meta name="theme-color" content="#0b0a14" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Safe Location: personal safety for every journey</title>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/landing.css" />
+  </head>
+  <body class="landing-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <div class="aurora" aria-hidden="true">
+      <span class="aurora-blob aurora-violet"></span>
+      <span class="aurora-blob aurora-pink"></span>
+      <span class="aurora-blob aurora-indigo"></span>
+    </div>
+
+    <header class="app-header landing-header">
+      <a class="brand" href="/welcome" aria-label="Safe Location home">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+      <nav class="landing-nav" aria-label="Page sections">
+        <a href="#how">How it works</a>
+        <a href="#trip">Trip Mode</a>
+        <a href="#sos">SOS</a>
+        <a href="#privacy">Privacy</a>
+      </nav>
+      <div class="landing-header-actions">
+        <a class="landing-signin" href="/signin" data-needs-server>Sign in</a>
+        <a class="button button-primary landing-cta-small" href="/">Open the tracker</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <h1 id="hero-heading" class="hero-title" data-reveal>
+            Every journey, watched over by the people you <em>trust</em>.
+          </h1>
+          <p class="hero-lead" data-reveal>
+            Safe Location records your location only while you choose to, keeps it private to your account, and alerts
+            your trusted contacts when you press SOS or miss a check-in on a trip.
+          </p>
+          <div class="hero-actions" data-reveal>
+            <a class="button button-primary hero-button" href="/">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M8 5.5v13l10.5-6.5L8 5.5Z" /></svg>
+              Open the tracker
+            </a>
+            <a class="button button-secondary hero-button" href="/signup" data-needs-server>Create an account</a>
+          </div>
+          <p class="device-note" data-device-only hidden data-reveal>
+            Tracking, the map and your history work today, saved on your device. Accounts, backup, SOS alerts and
+            Trip Mode are coming soon.
+          </p>
+          <ul class="hero-facts" data-reveal>
+            <li>Works in your phone's browser</li>
+            <li>Keeps recording without signal</li>
+            <li>112 is one tap away</li>
+          </ul>
+        </div>
+
+        <!-- Product preview: a live-looking tracker during a trip. Decorative; described for screen readers. -->
+        <div class="hero-visual" data-reveal>
+          <div class="device" role="img" aria-label="Preview of the Safe Location tracker during a trip: a status panel, a map with the route being drawn, and the SOS button.">
+            <div class="device-screen" aria-hidden="true">
+              <div class="mock-band" data-tone="calm">
+                <span class="mock-dot"></span>
+                <span class="mock-band-text">Trip to Lekki: recording every 1 minute</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-state-row">
+                  <p class="mock-state">Tracking active</p>
+                  <p class="mock-next">Next reading in <span class="mock-count">0:42</span></p>
+                </div>
+                <div class="mock-readouts">
+                  <div><span>GPS</span><b><i class="d d-ok"></i>±12 m · <span class="mock-age">3</span> s ago</b></div>
+                  <div><span>Connection</span><b class="mock-conn"><i class="d d-ok"></i>Online</b></div>
+                  <div><span>Backup</span><b class="mock-backup"><i class="d d-ok"></i>All uploaded</b></div>
+                  <div><span>Trip</span><b>Active</b></div>
+                </div>
+              </div>
+              <div class="mock-map">
+                <svg viewBox="0 0 320 190">
+                  <g class="mock-streets">
+                    <path d="M-10 40 L330 22" /><path d="M-10 98 L330 84" /><path d="M-10 150 L330 160" />
+                    <path d="M42 -10 L60 200" /><path d="M128 -10 L118 200" /><path d="M214 -10 L236 200" /><path d="M290 -10 L300 200" />
+                    <path class="mock-major" d="M-10 120 C 80 110, 150 60, 330 52" />
+                  </g>
+                  <path class="mock-route-ghost" d="M38 160 C 70 150, 92 118, 124 104 S 196 92, 214 70 S 262 36, 292 30" />
+                  <path class="mock-route" pathLength="100" d="M38 160 C 70 150, 92 118, 124 104 S 196 92, 214 70 S 262 36, 292 30" />
+                  <circle class="mock-start" cx="38" cy="160" r="6" />
+                  <!-- The latest-position pin rides the route; two rings pulse out from it. -->
+                  <g class="mock-pin">
+                    <circle class="mock-ring" r="7">
+                      <animate attributeName="r" values="7;22" dur="2.2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.8;0" dur="2.2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle class="mock-ring" r="7">
+                      <animate attributeName="r" values="7;22" dur="2.2s" begin="1.1s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.8;0" dur="2.2s" begin="1.1s" repeatCount="indefinite" />
+                    </circle>
+                    <circle class="mock-pin-dot" r="7" />
+                    <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.7;1" calcMode="spline"
+                      keySplines="0.45 0 0.25 1; 0 0 1 1" path="M38 160 C 70 150, 92 118, 124 104 S 196 92, 214 70 S 262 36, 292 30" />
+                  </g>
+                </svg>
+              </div>
+              <div class="mock-sos">
+                <span class="mock-sos-button">SOS</span>
+                <span class="mock-112">Call 112</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works: a real sequence, so the steps are numbered -->
+      <section class="band how" id="how" aria-labelledby="how-heading">
+        <div class="band-head" data-reveal>
+          <h2 id="how-heading">How it works</h2>
+          <p>Three steps, all in your browser. You decide when recording starts and stops.</p>
+        </div>
+        <ol class="steps" data-steps>
+          <li class="step" data-reveal>
+            <span class="step-num" aria-hidden="true">1</span>
+            <h3>Start tracking</h3>
+            <p>Pick how often to save your position: every 1, 2, 5 or 10 minutes. Each point is stored on your phone first, with its time and accuracy.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num" aria-hidden="true">2</span>
+            <h3>Back it up privately <span class="soon" data-device-only hidden>Coming soon</span></h3>
+            <p>Sign in and register your browser to back up your history to your account. Only you can see it. There are no public or shareable location links.</p>
+          </li>
+          <li class="step" data-reveal>
+            <span class="step-num" aria-hidden="true">3</span>
+            <h3>Get help when it matters <span class="soon" data-device-only hidden>Coming soon</span></h3>
+            <p>Press SOS to alert your trusted contacts, or start a trip and Safe Location asks if you're OK when you're late or your updates stop.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Trip Mode -->
+      <section class="band feature" id="trip" aria-labelledby="trip-heading">
+        <div class="feature-copy" data-reveal>
+          <h2 id="trip-heading">A trip that watches the clock for you <span class="soon" data-device-only hidden>Coming soon</span></h2>
+          <p>
+            Tell Safe Location where you're going and when you expect to arrive. The server keeps watch even when your
+            phone can't: if the arrival time passes or no update arrives for the period you chose, it asks you to check in.
+          </p>
+          <ul class="ticks">
+            <li>You choose who is told, and when: straight away, after a grace period, or never</li>
+            <li>Messages state only the facts, with the age and accuracy of your last location</li>
+            <li>One tap on "I'm OK" lets everyone know you're fine</li>
+          </ul>
+        </div>
+        <div class="feature-visual" data-reveal aria-hidden="true">
+          <div class="panel-mock checkin-mock">
+            <div class="checkin-head">
+              <span class="trip-pill">Check-in requested</span>
+              <span class="checkin-route">Yaba → Lekki Phase 1</span>
+            </div>
+            <p class="checkin-q">Your expected arrival time has passed. Are you OK?</p>
+            <p class="checkin-next">If you don't answer by 21:40, Mum will be told.</p>
+            <div class="checkin-timer"><span></span></div>
+            <span class="checkin-ok">I'm OK</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOS -->
+      <section class="band feature feature-flip" id="sos" aria-labelledby="sos-heading">
+        <div class="feature-copy" data-reveal>
+          <h2 id="sos-heading">SOS in one tap, with five seconds to change your mind <span class="soon" data-device-only hidden>Coming soon</span></h2>
+          <p>
+            Your trusted contacts get an SMS or email with your location and how old it is. You see what happened to
+            every message, and it only says "delivered" when the provider confirms it.
+          </p>
+          <p class="feature-note">
+            Safe Location alerts the people you choose. It does not contact the police or emergency services.
+            If you are in immediate danger, <a href="tel:112">call 112</a>.
+          </p>
+        </div>
+        <div class="feature-visual" data-reveal aria-hidden="true">
+          <div class="panel-mock sos-mock">
+            <div class="sos-ring-wrap">
+              <span class="sos-wave"></span><span class="sos-wave sos-wave-2"></span>
+              <span class="sos-disc">SOS</span>
+            </div>
+            <p class="sos-mock-count">Sending SOS in <b class="sos-mock-seconds">5</b>…</p>
+            <ul class="sos-mock-list">
+              <li><i class="d d-ok"></i>Mum (SMS): delivered, confirmed by provider</li>
+              <li><i class="d d-wait"></i>Tunde (email): sent, waiting for confirmation</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Offline -->
+      <section class="band feature" id="offline" aria-labelledby="offline-heading">
+        <div class="feature-copy" data-reveal>
+          <h2 id="offline-heading">No signal? Nothing is lost.</h2>
+          <p>
+            On a weak network or with no data, points are saved on your phone and upload by themselves when you're back
+            online, each exactly once. The tracker always shows what is still waiting.
+          </p>
+        </div>
+        <div class="feature-visual" data-reveal aria-hidden="true">
+          <div class="panel-mock queue-mock">
+            <div class="queue-cloud">
+              <svg viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.2 4.4 4.4 0 0 0 7 18Z" /></svg>
+              <span>Your account</span>
+            </div>
+            <div class="queue-track">
+              <span class="queue-dot"></span><span class="queue-dot"></span><span class="queue-dot"></span><span class="queue-dot"></span>
+            </div>
+            <div class="queue-phone">
+              <span class="queue-label">On this phone</span>
+              <b>4 points waiting · uploading…</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy promises: what the product refuses to do -->
+      <section class="band privacy" id="privacy" aria-labelledby="privacy-heading">
+        <div class="band-head" data-reveal>
+          <h2 id="privacy-heading">What Safe Location will never do</h2>
+          <p>Safety tools hold sensitive data. These limits are built into how it works.</p>
+        </div>
+        <ul class="promises">
+          <li data-reveal><b>Track anyone without their consent.</b> Only the person holding the phone can start recording, and the browser asks for permission first.</li>
+          <li data-reveal><b>Make your location public.</b> No public pages, no shareable links. Your history is visible only to you when signed in.</li>
+          <li data-reveal><b>Claim a message was delivered when it wasn't.</b> "Delivered" appears only after the SMS or email provider confirms it.</li>
+          <li data-reveal><b>Say you're in danger.</b> Messages describe what is known, like a missed check-in, and nothing more.</li>
+          <li data-reveal><b>Pretend to be an emergency service.</b> It alerts your contacts. For the police, fire or ambulance, call 112.</li>
+          <li data-reveal><b>Promise what a browser can't do.</b> Recording runs while the tracker is open. If you close it or your phone switches off, recording stops.</li>
+        </ul>
+      </section>
+
+      <!-- Closing call to action -->
+      <section class="closing" aria-labelledby="closing-heading">
+        <div class="closing-inner" data-reveal>
+          <h2 id="closing-heading">Ready when you are.</h2>
+          <p data-needs-server>Open the tracker now, no account needed. Sign up when you want backup, SOS and Trip Mode.</p>
+          <p data-device-only hidden>Open the tracker now, no account needed. Backup, SOS alerts and Trip Mode are on their way.</p>
+          <div class="hero-actions">
+            <a class="button button-primary hero-button" href="/">Open the tracker</a>
+            <a class="button button-secondary hero-button" href="/signup" data-needs-server>Create an account</a>
+          </div>
+          <a class="call-112 closing-112" href="tel:112"><span>In immediate danger?</span> <strong>Call 112</strong></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="landing-footer">
+      <p>Safe Location · consent-based personal safety for Nigeria</p>
+      <nav aria-label="Footer">
+        <a href="/">Tracker</a>
+        <a href="/signin" data-needs-server>Sign in</a>
+        <a href="/signup" data-needs-server>Create account</a>
+      </nav>
+    </footer>
+
+    <script src="/config.js"></script>
+    <script src="/landing.js"></script>
+  </body>
+</html>

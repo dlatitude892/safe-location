@@ -1,0 +1,26 @@
+{
+  "name": "safe-location",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Consent-based personal safety location tracker with accounts and backup.",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env server/index.js",
+    "dev:test-account": "node --env-file-if-exists=.env server/scripts/create-test-account.js",
+    "start:static": "python -m http.server 8000 --bind 127.0.0.1",
+    "test": "npm run test:server && npm run test:e2e",
+    "test:server": "node --test \"server/tests/*.test.js\"",
+    "test:e2e": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.7",
+    "fastify": "^5.12.5"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

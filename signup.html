@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a14" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Create account · Safe Location</title>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="auth-body" data-page="signup">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Safe Location tracker">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+    </header>
+    <main class="auth-main" id="main">
+      <section class="card auth-card" aria-labelledby="auth-heading">
+        <h1 id="auth-heading">Create an account</h1>
+        <p class="auth-lead">Your account backs up the locations you choose to record. Nobody can track you without you starting it.</p>
+        <p class="notice" id="notice" role="status" hidden></p>
+        <form id="auth-form" novalidate>
+          <div class="field">
+            <label for="name">Your name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required maxlength="80" />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <div class="password-field">
+              <input id="password" name="password" type="password" autocomplete="new-password" required minlength="10" maxlength="128" aria-describedby="password-help" />
+              <button class="toggle-password" type="button" aria-controls="password" aria-pressed="false">Show</button>
+            </div>
+            <p class="field-help" id="password-help">At least 10 characters. A few unrelated words make a strong, memorable password.</p>
+          </div>
+          <button class="button button-primary" type="submit">Create account</button>
+        </form>
+        <div class="auth-done" id="done" hidden>
+          <p>We sent a confirmation link to <strong id="done-email"></strong>. Open it to finish creating your account. The link expires in 24 hours.</p>
+          <button class="button button-secondary" id="resend" type="button">Send the link again</button>
+        </div>
+        <p class="auth-alt">Already have an account? <a href="/signin">Sign in</a></p>
+        <p class="dev-hint" id="dev-hint" hidden>
+          Development mode: emails are not really sent. Open the newest file in the project's
+          <code>data/dev-outbox</code> folder to find the link.
+        </p>
+      </section>
+    </main>
+    <script src="/auth-pages.js"></script>
+  </body>
+</html>

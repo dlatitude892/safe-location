@@ -1,0 +1,9 @@
+# Netlify settings for the tracking-only Safe Location site.
+# Netlify serves files only, so accounts, backup, SOS alerts and Trip Mode show as "coming soon" here.
+# They go live when the Safe Location server is deployed (see README, "Live site").
+[build]
+  command = "node scripts/build-netlify.js"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

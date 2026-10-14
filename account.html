@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0a14" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
+    <title>Your account · Safe Location</title>
+    <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="account-body">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="Safe Location tracker">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" rx="15" fill="#7c3aed" />
+          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+        </svg>
+        <span>Safe Location</span>
+      </a>
+      <div class="header-status">
+        <a class="pill pill-link" href="/trips">Trips</a>
+        <a class="pill pill-link" href="/emergency">Emergency contacts</a>
+        <a class="pill pill-link" href="/">Back to tracker</a>
+      </div>
+    </header>
+
+    <main class="account-layout" id="main" aria-busy="true">
+      <h1 class="account-title">Your account</h1>
+      <p class="notice" id="notice" role="status" hidden></p>
+
+      <div class="sheet">
+      <section class="sheet-section" aria-labelledby="profile-heading">
+        <div class="card-heading"><h2 id="profile-heading">Profile</h2></div>
+        <dl class="details">
+          <div><dt>Name</dt><dd id="profile-name">—</dd></div>
+          <div><dt>Email</dt><dd id="profile-email">—</dd></div>
+          <div><dt>Member since</dt><dd id="profile-since">—</dd></div>
+          <div><dt>Uploaded points</dt><dd id="profile-points">—</dd></div>
+        </dl>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="this-browser-heading">
+        <div class="card-heading"><h2 id="this-browser-heading">This browser</h2></div>
+        <p id="this-browser">Checking…</p>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="devices-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="devices-heading">Devices</h2>
+            <p class="card-hint">Devices that can back up locations to your account. Only you can see them.</p>
+          </div>
+        </div>
+        <ul class="row-list" id="device-list"></ul>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="trips-heading">
+        <div class="card-heading">
+          <div>
+            <h2 id="trips-heading">Uploaded recordings</h2>
+            <p class="card-hint">Each recording runs from Start to Stop on one device (a Trip Mode journey is one recording). Times are as reported by the device. <a href="/trips">Trip history</a></p>
+          </div>
+        </div>
+        <ul class="row-list" id="trip-list"></ul>
+      </section>
+
+      <section class="sheet-section" aria-labelledby="sessions-heading">
+        <div class="card-heading"><h2 id="sessions-heading">Signed-in sessions</h2></div>
+        <ul class="row-list" id="session-list"></ul>
+        <button class="button button-secondary" id="revoke-others" type="button">Sign out everywhere else</button>
+      </section>
+      </div>
+
+      <section class="card" aria-labelledby="signout-heading">
+        <div class="card-heading"><h2 id="signout-heading">Sign out</h2></div>
+        <label class="check">
+          <input id="signout-clear" type="checkbox" />
+          <span>Also remove this account's location history from this browser</span>
+        </label>
+        <p class="field-help" id="signout-warning" hidden></p>
+        <button class="button button-secondary" id="signout" type="button">Sign out</button>
+      </section>
+
+      <section class="card account-wide danger-zone" aria-labelledby="delete-heading">
+        <div class="card-heading"><h2 id="delete-heading">Delete account</h2></div>
+        <p>
+          This permanently deletes your account, all your registered devices and every location uploaded to it.
+          It cannot be undone.
+        </p>
+        <form id="delete-form" novalidate>
+          <div class="field">
+            <label for="delete-password">Your password</label>
+            <input id="delete-password" type="password" autocomplete="current-password" required />
+          </div>
+          <div class="field">
+            <label for="delete-confirm">Type DELETE to confirm</label>
+            <input id="delete-confirm" type="text" autocomplete="off" required />
+          </div>
+          <label class="check">
+            <input id="delete-local" type="checkbox" checked />
+            <span>Also delete this account's location history saved in this browser</span>
+          </label>
+          <button class="button button-stop" type="submit">Delete my account</button>
+        </form>
+      </section>
+    </main>
+
+    <dialog class="dialog" id="remove-dialog" aria-labelledby="remove-title">
+      <form method="dialog" id="remove-form">
+        <h2 id="remove-title">Remove device</h2>
+        <p id="remove-text"></p>
+        <fieldset class="choice">
+          <legend>What should happen to the locations it uploaded?</legend>
+          <label class="check"><input type="radio" name="remove-mode" value="keep" checked /> <span>Keep them in my account</span></label>
+          <label class="check"><input type="radio" name="remove-mode" value="delete" /> <span>Delete them permanently</span></label>
+        </fieldset>
+        <div class="dialog-actions">
+          <button class="button button-secondary" value="cancel" type="submit">Cancel</button>
+          <button class="button button-stop" value="confirm" type="submit">Remove device</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/account.js"></script>
+  </body>
+</html>
