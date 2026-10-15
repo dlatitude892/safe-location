@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-13T10:21:52.811Z",
+  "generatedAt": "2026-10-15T09:54:12.668Z",
   "title": "Design System: Safe Location",
   "extensions": {
-    "provenance": "Recorded after the build (palette \"Violet night\") from style.css, landing.css, landing.js, index.html, welcome.html, account.html, emergency.html, trips.html, signin.html, app.js and tests/landing.spec.js. Rendered evidence: .impeccable/review/*.png, Playwright captures of the real app against a throwaway local server with simulated GPS. landing-desktop-hero.png, landing-mobile-full.png and tracker-desktop.png were copied from the session scratchpad design/l1 captures taken after the Violet night palette and /welcome shipped; the other review images predate the palette change.",
+    "provenance": "Recorded after the build (palette \"Violet night\"). Phase 8 map-first tracker (approved prototype prototypes/tracker-a.html, Layout A v1) from index.html, style.css sections \"Map-first tracker (Phase 8)\" and \"Phase 8 refinements\", app.js \"11b. The sheet\", renderSos, renderCondition, renderTrip and the map drawing; other surfaces from landing.css, landing.js, welcome.html, account.html, emergency.html, trips.html, signin.html and tests/landing.spec.js. Rendered evidence: .impeccable/review/phase8-mobile-*.png (390x844) and phase8-desktop-*.png (1440x900), Playwright captures of the real app against a throwaway local server with simulated GPS (11-checkin had its check-in request injected client-side); landing-desktop-hero.png and landing-mobile-full.png for /welcome. Older desktop-*.png, mobile*.png and tracker-desktop.png show the superseded pre-Phase 8 tracker.",
     "colorMeta": {
       "bg": {
         "role": "neutral",
@@ -68,6 +68,23 @@
           "oklch(82% 0.024 291.7)",
           "oklch(95% 0.024 291.7)"
         ]
+      },
+      "sheet": {
+        "role": "neutral",
+        "displayName": "Sheet Violet",
+        "canonical": "#17141f",
+        "oklch": "oklch(20% 0.022 296) (approximate)",
+        "tonalRamp": [
+          "oklch(15% 0.022 296)",
+          "oklch(26% 0.022 296)",
+          "oklch(37% 0.022 296)",
+          "oklch(48% 0.022 296)",
+          "oklch(59% 0.022 296)",
+          "oklch(70% 0.022 296)",
+          "oklch(82% 0.022 296)",
+          "oklch(95% 0.022 296)"
+        ],
+        "purpose": "Tracker sheet and computer panel, brand header above the panel, SOS and check-in overlay cards."
       },
       "surface-raised": {
         "role": "neutral",
@@ -484,9 +501,13 @@
         "displayName": "Lead",
         "purpose": "Landing intro paragraph, Muted Ink; band copy 1.06rem."
       },
+      "countdown": {
+        "displayName": "Countdown",
+        "purpose": "The seconds inside the SOS countdown ring only."
+      },
       "display": {
         "displayName": "Display",
-        "purpose": "The instrument's state line only."
+        "purpose": "The sheet's state line; check-in heading 1.5rem, active SOS heading 1.35rem."
       },
       "headline": {
         "displayName": "Headline",
@@ -494,15 +515,15 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Section headings inside sheets and cards."
+        "purpose": "Sheet section headings; SOS panel heading 1.15rem."
       },
       "condition": {
         "displayName": "Condition",
-        "purpose": "The one tone-carrying condition sentence."
+        "purpose": "The status pill's one short line; full sentence kept for screen readers."
       },
       "reading": {
         "displayName": "Reading",
-        "purpose": "Readout and detail values, tabular numerals; 0.9rem below 560px."
+        "purpose": "Readout and detail values, tabular numerals; next-reading countdown 0.9rem."
       },
       "reading-lg": {
         "displayName": "Large Reading",
@@ -514,7 +535,7 @@
       },
       "button": {
         "displayName": "Button",
-        "purpose": "All buttons; 1rem for primary instrument and rail actions."
+        "purpose": "All buttons; 1rem for the sheet's 50px actions, 1.05rem for I'm OK."
       },
       "label": {
         "displayName": "Label",
@@ -522,7 +543,7 @@
       },
       "sos": {
         "displayName": "SOS",
-        "purpose": "The SOS button; 800 1.85rem 'SOS' word in the narrow phone column."
+        "purpose": "The word SOS on the 72px dock; the sheet's SOS pill is 700 0.9rem 0.05em."
       }
     },
     "shadows": [
@@ -532,9 +553,34 @@
         "purpose": "Every focusable element; replaces the outline."
       },
       {
+        "name": "float",
+        "value": "0 10px 26px -14px rgb(0 0 0 / 0.85)",
+        "purpose": "Status pill over the map. Recenter uses 0 8px 20px -10px rgb(0 0 0 / 0.8); Call 112 pill and floating notes 0 10px 24px -12px rgb(0 0 0 / 0.8). Translucent floats add a 10-12px backdrop blur."
+      },
+      {
+        "name": "sheet-lift",
+        "value": "0 -18px 40px -18px rgb(0 0 0 / 0.75)",
+        "purpose": "Phone bottom sheet only; the computer panel has none."
+      },
+      {
+        "name": "overlay-card",
+        "value": "0 30px 60px -24px rgb(0 0 0 / 0.85)",
+        "purpose": "SOS panel and check-in card over a rgb(8 6 16 / 0.72-0.75) scrim with 6px blur."
+      },
+      {
+        "name": "sos-glow",
+        "value": "0 14px 30px -10px rgb(220 38 38 / 0.9), inset 0 2px 0 rgb(255 255 255 / 0.22), 0 0 0 5px rgb(220 38 38 / 0.18)",
+        "purpose": "Round SOS dock only, over radial-gradient(circle at 35% 30%, #ef4444, #dc2626 70%)."
+      },
+      {
+        "name": "route-glow",
+        "value": "drop-shadow(0 0 6px rgb(139 92 246 / 0.65))",
+        "purpose": "CSS filter on the current route line only."
+      },
+      {
         "name": "map-control-lift",
         "value": "0 4px 14px rgb(0 0 0 / 0.35)",
-        "purpose": "Leaflet zoom bars only."
+        "purpose": "Leaflet zoom bars (computers only; hidden on phones)."
       },
       {
         "name": "marker-halo",
@@ -544,7 +590,7 @@
       {
         "name": "landing-hero-glow",
         "value": "0 10px 30px -10px rgb(124 58 237 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.18)",
-        "purpose": "Landing page primary hero button only; tracker buttons stay shadowless."
+        "purpose": "Landing page primary hero button only."
       },
       {
         "name": "landing-device",
@@ -559,19 +605,54 @@
     ],
     "motion": [
       {
+        "name": "sheet-slide",
+        "value": "420ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Phone sheet moving between peek, half and full; the SOS dock and Leaflet bottom controls ride with it. None while dragging."
+      },
+      {
         "name": "tone-shift",
         "value": "400ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Instrument edge, condition band and dot colour when the overall tone changes."
+        "purpose": "Status pill edge, text and dot colour when the overall tone changes."
       },
       {
         "name": "control-state",
         "value": "150ms ease",
-        "purpose": "Button and switch colour and position changes."
+        "purpose": "Button and switch colour changes; SOS dock press to 0.94 scale."
       },
       {
         "name": "breathe",
         "value": "2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite",
-        "purpose": "Calm-tone condition dot ring; the only ambient motion in the tracker. Off under reduced motion."
+        "purpose": "Calm-tone status dot ring while recording is healthy."
+      },
+      {
+        "name": "marker-ping",
+        "value": "2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite",
+        "purpose": "Latest-position marker ring grows to 3x and fades; amber when flagged."
+      },
+      {
+        "name": "sos-pulse",
+        "value": "1.6s ease-out infinite",
+        "purpose": "Hidden active SOS: 3px red ring on the dock; the live-SOS banner dot breathes at the same pace."
+      },
+      {
+        "name": "sos-ring",
+        "value": "1s linear per second",
+        "purpose": "SOS countdown ring empties via the registered --sos-left property."
+      },
+      {
+        "name": "overlay-in",
+        "value": "fade 200ms ease-out; rise 24px over 320ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "SOS and check-in scrims fade, their cards rise."
+      },
+      {
+        "name": "map-tools-fade",
+        "value": "200ms ease",
+        "purpose": "Recenter fades out when the phone sheet rises past peek."
+      },
+      {
+        "name": "disclosure",
+        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Check-in options chevron turning."
       },
       {
         "name": "spin",
@@ -621,46 +702,40 @@
       {
         "name": "reduced-motion",
         "value": "prefers-reduced-motion: reduce",
-        "purpose": "Stops every animation on every page; landing SVGs paused at their finished frame; tests/landing.spec.js asserts zero running animations."
+        "purpose": "Stops every animation and transition on every page, tracker included; landing SVGs paused at their finished frame; tests/landing.spec.js asserts zero running animations."
       }
     ],
     "breakpoints": [
       {
-        "name": "readouts-2x2",
-        "value": "1180px"
-      },
-      {
-        "name": "stacked-with-sos-column",
-        "value": "900px"
-      },
-      {
-        "name": "compact",
-        "value": "720px"
-      },
-      {
-        "name": "phone",
-        "value": "560px"
-      },
-      {
-        "name": "smallest-phone",
-        "value": "360px"
-      },
-      {
-        "name": "narrow-details",
-        "value": "340px"
+        "name": "tracker-panel",
+        "value": "960px",
+        "purpose": "Below: full-screen map with bottom sheet. At and above: 400px left panel beside the map."
       },
       {
         "name": "landing-single-column",
         "value": "980px"
+      },
+      {
+        "name": "compact",
+        "value": "720px",
+        "purpose": "Account, emergency, trips, sign-in and landing tighten."
+      },
+      {
+        "name": "header-about",
+        "value": "400px"
+      },
+      {
+        "name": "narrow-details",
+        "value": "340px"
       }
     ],
     "conditionTones": {
-      "idle": "Grey dot, Raised Charcoal band, Hairline edge: not recording.",
-      "calm": "Working Violet: recording and reaching the server; the dot breathes.",
-      "attention": "Attention Amber: offline, stale GPS, paused or delayed trip, uploads waiting, storage failing, permission denied while recording.",
-      "alert": "Alarm Red: SOS countdown, sending, queued or active; check-in requested. Alert outranks attention, attention outranks calm."
+      "idle": "Faint Ink dot, Muted Ink text, Strong Hairline edge: not recording.",
+      "calm": "Working Violet dot, Lavender text, violet edge at 0.6: recording and reaching the server; the dot breathes.",
+      "attention": "Attention Amber dot, text and edge at 0.6: offline, stale GPS, paused or delayed trip, uploads waiting, storage failing, permission denied while recording.",
+      "alert": "Alarm Red dot and edge on rgb(48 14 22 / 0.92): SOS countdown, sending, queued or active; check-in requested. Alert outranks attention, attention outranks calm."
     },
-    "motionBudget": "The tracker stays nearly still (battery); motion lives on the landing and sign-in pages.",
+    "motionBudget": "The tracker moves only to carry state (sheet, tone, recording dot, marker ping, live SOS); no ambient background motion. Ambient motion lives on the landing and sign-in pages.",
     "surfaces": {
       "landing": {
         "route": "/welcome",
@@ -671,8 +746,8 @@
         ],
         "mode": "Persuade, inside the same world",
         "linkedFrom": [
-          "tracker header \"How it works\"",
-          "tracker footer",
+          "tracker brand header \"How it works\" (computers)",
+          "tracker sheet footer",
           "sign-in card"
         ],
         "sections": [
@@ -688,7 +763,44 @@
           ".impeccable/review/landing-desktop-hero.png",
           ".impeccable/review/landing-mobile-full.png"
         ]
+      },
+      "tracker": {
+        "route": "/",
+        "files": [
+          "index.html",
+          "style.css",
+          "app.js"
+        ],
+        "prototype": "prototypes/tracker-a.html (Layout A v1)",
+        "evidence": [
+          ".impeccable/review/phase8-mobile-*.png",
+          ".impeccable/review/phase8-desktop-*.png"
+        ]
       }
+    },
+    "sheetStates": {
+      "peek": "Grab handle + status block to the end of the actions row (state line, next reading, message, two 50px actions).",
+      "half": "Peek plus the readouts: 56% of the shell height, at least peek + 120px.",
+      "full": "Everything; floating SOS dock hides and a sticky SOS · Call 112 row holds the top of the sheet.",
+      "controls": "Grab handle: drag (settles on nearest), tap/Enter steps peek > half > full > peek; status pill toggles peek/half; keyboard focus past peek opens full.",
+      "order": [
+        "Status block (SOS banner when live, state, message, actions incl. trip Pause/End trip, readouts)",
+        "Trip Mode (form, Check-in options disclosure)",
+        "Location history (Fit route, Clear history)",
+        "Recording",
+        "Backup and sync",
+        "Latest saved location",
+        "Statistics",
+        "Map (Dark/Street, Follow my position, key)",
+        "Footer"
+      ]
+    },
+    "mapStyle": {
+      "default": "dark",
+      "darkTiles": "CARTO dark_all when CARTO_API_KEY is set; otherwise OSM with .tiles-dark filter invert(1) grayscale(1) sepia(0.5) hue-rotate(210deg) saturate(1.7) brightness(0.68) contrast(1.08)",
+      "currentRoute": "6px Working Violet, 0.95 opacity, route-glow",
+      "earlierRoutes": "3px Earlier Route, 0.6 opacity",
+      "gaps": "3px dashes 2 9, #cbd5e1 on dark, #334155 on street"
     }
   },
   "components": [
@@ -696,7 +808,7 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The one solid violet action in a region, such as Start Tracking.",
+      "description": "The one solid violet action in a region, such as Start Tracking; 50px with 14px corners in the sheet's actions row.",
       "html": "<button class=\"ds-btn ds-btn-primary\"><svg viewBox=\"0 0 24 24\"><path class=\"f\" d=\"M8 5v14l11-7z\"/></svg>Start Tracking</button>",
       "css": ".ds-btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:50px;padding:.55rem 1rem;border:1px solid transparent;border-radius:9px;font:650 1rem Geist,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease,border-color 150ms ease,color 150ms ease}.ds-btn svg{width:18px;height:18px}.ds-btn .f{fill:currentColor}.ds-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-btn-primary{background:var(--accent-strong,#7c3aed);color:#fff}.ds-btn-primary:hover{background:#6d28d9}"
     },
@@ -725,14 +837,6 @@
       "css": ".ds-field{display:grid;gap:.35rem;font-family:Geist,system-ui,sans-serif}.ds-field label{color:var(--text-muted,#b0a9c6);font-size:.82rem;font-weight:600}.ds-field input{min-height:44px;padding:.5rem .75rem;border:1px solid var(--control-border,#7a7299);border-radius:9px;background:var(--surface-raised,#1d1a2b);color:var(--text,#eeeaf7);font:inherit}.ds-field input:focus-visible{border-color:var(--accent,#8b5cf6);outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
     },
     {
-      "name": "Status Pill",
-      "kind": "chip",
-      "refersTo": "pill",
-      "description": "Round header status with a state dot.",
-      "html": "<span class=\"ds-pill\"><span class=\"ds-dot\"></span>Online</span> <span class=\"ds-pill ds-off\"><span class=\"ds-dot\"></span>Offline</span>",
-      "css": ".ds-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.3rem .7rem;border:1px solid var(--border,#2a2640);border-radius:999px;background:var(--surface,#15131f);color:var(--text-muted,#b0a9c6);font:600 .8rem Geist,system-ui,sans-serif}.ds-dot{width:7px;height:7px;border-radius:50%;background:var(--success,#34d399)}.ds-off{border-color:rgb(245 181 68 / .45);background:rgb(245 181 68 / .12);color:var(--warning,#f5b544)}.ds-off .ds-dot{background:var(--warning,#f5b544)}"
-    },
-    {
       "name": "History Badges",
       "kind": "chip",
       "refersTo": "badge-warning",
@@ -741,42 +845,58 @@
       "css": ".ds-badge{padding:.12rem .5rem;border:1px solid var(--border,#2a2640);border-radius:999px;font:650 .72rem Geist,system-ui,sans-serif;white-space:nowrap}.ds-w{border-color:rgb(245 181 68 / .4);background:rgb(245 181 68 / .12);color:var(--warning,#f5b544)}.ds-d{border-color:rgb(248 113 113 / .4);background:rgb(248 113 113 / .12);color:var(--danger,#f87171)}"
     },
     {
-      "name": "Status Instrument",
-      "kind": "custom",
-      "refersTo": "readout",
-      "description": "Signature: one tone-carrying condition band over a state line and hairline-ruled readouts.",
-      "html": "<section class=\"ds-inst\"><p class=\"ds-cond\"><span class=\"ds-cd\"></span>Recording every 1 minute</p><div class=\"ds-ib\"><p class=\"ds-state\">Tracking active</p><dl class=\"ds-ro\"><div><dt>GPS</dt><dd>±16 m · just now</dd></div><div><dt>Connection</dt><dd>Online</dd></div><div><dt>Backup</dt><dd>All uploaded</dd></div><div><dt>Saved here</dt><dd>128 points</dd></div></dl></div></section>",
-      "css": ".ds-inst{--tone:#8b5cf6;border:1px solid rgb(139 92 246 / .5);border-radius:14px;background:var(--surface,#15131f);color:var(--text,#eeeaf7);font-family:Geist,system-ui,sans-serif;overflow:hidden;transition:border-color 400ms cubic-bezier(.16,1,.3,1)}.ds-cond{display:flex;align-items:center;gap:.6rem;margin:0;padding:.55rem 1.1rem;border-bottom:1px solid rgb(139 92 246 / .5);background:rgb(139 92 246 / .13);color:var(--accent-text,#c4b5fd);font-size:.9rem;font-weight:650}.ds-cd{position:relative;width:10px;height:10px;border-radius:50%;background:var(--tone)}.ds-cd::after{content:'';position:absolute;inset:-4px;border:2px solid var(--tone);border-radius:50%;animation:ds-br 2.4s cubic-bezier(.16,1,.3,1) infinite}@keyframes ds-br{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(1.6)}}@media (prefers-reduced-motion:reduce){.ds-cd::after{animation:none;opacity:0}}.ds-ib{padding:1rem 1.1rem 1.1rem}.ds-state{margin:0;font-size:2rem;font-weight:700;letter-spacing:-.025em;line-height:1.15}.ds-ro{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin:1rem 0 0;border:1px solid var(--border,#2a2640);border-radius:9px;background:var(--border,#2a2640);overflow:hidden}.ds-ro div{padding:.6rem .75rem .65rem;background:var(--surface,#15131f)}.ds-ro dt{color:var(--text-muted,#b0a9c6);font-size:.72rem;font-weight:600}.ds-ro dd{margin:.2rem 0 0;font-size:1rem;font-weight:650;font-variant-numeric:tabular-nums}"
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Signature: the floating tone-carrying status line; tap to raise the sheet.",
+      "html": "<div class=\"ds-sp\" data-tone=\"calm\"><span class=\"ds-sd\"></span><span>Recording · every 1 minute</span></div> <div class=\"ds-sp\" data-tone=\"attention\"><span class=\"ds-sd\"></span><span>Offline · 3 waiting</span></div> <div class=\"ds-sp\" data-tone=\"alert\"><span class=\"ds-sd\"></span><span>SOS active</span></div>",
+      "css": ".ds-sp{--tone:#8d86a6;--tt:#b0a9c6;--te:#3b3557;display:inline-flex;align-items:center;gap:9px;height:44px;padding:0 16px;border:1px solid var(--te);border-radius:999px;background:rgb(21 19 31 / .9);backdrop-filter:blur(12px);box-shadow:0 10px 26px -14px rgb(0 0 0 / .85);color:var(--tt);font-family:Geist,system-ui,sans-serif;font-size:.875rem;font-weight:600;cursor:pointer;transition:border-color 400ms cubic-bezier(.16,1,.3,1),color 400ms cubic-bezier(.16,1,.3,1)}.ds-sp:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-sp[data-tone=calm]{--tone:#8b5cf6;--tt:#c4b5fd;--te:rgb(139 92 246 / .6)}.ds-sp[data-tone=attention]{--tone:#f5b544;--tt:#f5b544;--te:rgb(245 181 68 / .6)}.ds-sp[data-tone=alert]{--tone:#f87171;--tt:#ffc4c4;--te:#f87171;background:rgb(48 14 22 / .92)}.ds-sd{position:relative;width:10px;height:10px;border-radius:50%;background:var(--tone)}.ds-sp[data-tone=calm] .ds-sd::after{content:'';position:absolute;inset:-4px;border:2px solid var(--tone);border-radius:50%;animation:ds-br 2.4s cubic-bezier(.16,1,.3,1) infinite}@keyframes ds-br{from{opacity:.7;transform:scale(.6)}to{opacity:0;transform:scale(1.6)}}@media (prefers-reduced-motion:reduce){.ds-sd::after{animation:none!important;opacity:0}}"
     },
     {
-      "name": "SOS Column",
-      "kind": "custom",
-      "refersTo": "button-sos",
-      "description": "Signature: Emergency Red SOS with Call 112 pinned beneath.",
-      "html": "<section class=\"ds-sos\"><button class=\"ds-sosb\">Send SOS</button><a class=\"ds-112\" href=\"#\">In immediate danger? <strong>Call 112</strong></a></section>",
-      "css": ".ds-sos{display:flex;flex-direction:column;gap:1rem;padding:1.1rem;border:1px solid rgb(248 113 113 / .35);border-radius:14px;background:var(--surface,#15131f);font-family:Geist,system-ui,sans-serif}.ds-sosb{min-height:56px;border:0;border-radius:9px;background:var(--danger-strong,#dc2626);color:#fff;font:750 1.1rem Geist,system-ui,sans-serif;letter-spacing:.02em;cursor:pointer;transition:background-color 150ms ease}.ds-sosb:hover{background:#b91c1c}.ds-sosb:focus-visible,.ds-112:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-112{display:flex;align-items:center;justify-content:center;gap:.3em;min-height:44px;border:1px solid rgb(248 113 113 / .45);border-radius:9px;color:#ffb4b4;text-decoration:none}.ds-112:hover{background:rgb(248 113 113 / .12)}"
-    },
-    {
-      "name": "Ruled Sheet",
+      "name": "Sheet Status Block",
       "kind": "card",
       "refersTo": "sheet",
-      "description": "One panel whose sections are divided by hairlines instead of separate cards.",
-      "html": "<div class=\"ds-sheet\"><section><h2>Recording</h2><p>Every 1 minute</p></section><section><h2>Backup and sync</h2><p>Synchronization complete</p></section></div>",
-      "css": ".ds-sheet{border:1px solid var(--border,#2a2640);border-radius:14px;background:var(--surface,#15131f);color:var(--text,#eeeaf7);font-family:Geist,system-ui,sans-serif}.ds-sheet section{padding:1.1rem}.ds-sheet section+section{border-top:1px solid var(--border,#2a2640)}.ds-sheet h2{margin:0 0 .5rem;font-size:1.0625rem;font-weight:650;letter-spacing:-.01em}.ds-sheet p{margin:0;color:var(--text-muted,#b0a9c6)}"
+      "description": "Signature: the peek of the bottom sheet: handle, state line, next reading, message, two 50px actions, then ruled readouts.",
+      "html": "<section class=\"ds-sheet\"><div class=\"ds-grab\"><span></span></div><div class=\"ds-st\"><div class=\"ds-head\"><p class=\"ds-state\">Tracking active</p><p class=\"ds-next\">Next reading in 0:58</p></div><div class=\"ds-acts\"><button class=\"ds-a2\">Stop tracking</button><button class=\"ds-a2\">Start a trip</button></div><dl class=\"ds-ro\"><div><dt>GPS</dt><dd>±12 m · just now</dd></div><div><dt>Connection</dt><dd>Online</dd></div><div><dt>Backup</dt><dd>All uploaded</dd></div><div><dt>Saved here</dt><dd>4 points</dd></div></dl></div></section>",
+      "css": ".ds-sheet{max-width:400px;border-top:1px solid #3b3557;border-radius:22px 22px 0 0;background:linear-gradient(180deg,rgb(196 181 253 / .05),transparent 140px),#17141f;box-shadow:0 -18px 40px -18px rgb(0 0 0 / .75);color:#eeeaf7;font-family:Geist,system-ui,sans-serif}.ds-grab{display:grid;place-items:center;height:30px}.ds-grab span{width:40px;height:5px;border-radius:3px;background:#3b3557}.ds-st{padding:2px 18px 18px}.ds-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.25rem 1rem}.ds-state{margin:0;font-size:1.6rem;font-weight:700;letter-spacing:-.025em;line-height:1.15}.ds-next{margin:0;color:#b0a9c6;font-size:.9rem;font-variant-numeric:tabular-nums}.ds-acts{display:flex;gap:10px;margin-top:12px}.ds-a2{flex:1;min-height:50px;border:1px solid #3b3557;border-radius:14px;background:#1d1a2b;color:#eeeaf7;font:650 1rem Geist,system-ui,sans-serif;cursor:pointer;transition:border-color 150ms ease}.ds-a2:hover{border-color:#8b5cf6}.ds-a2:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-ro{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin:16px 0 0;border:1px solid #2a2640;border-radius:9px;background:#2a2640;overflow:hidden}.ds-ro div{padding:.6rem .75rem .65rem;background:#15131f}.ds-ro dt{color:#b0a9c6;font-size:.72rem;font-weight:600}.ds-ro dd{margin:.2rem 0 0;font-size:1rem;font-weight:650;font-variant-numeric:tabular-nums}"
+    },
+    {
+      "name": "SOS Dock",
+      "kind": "custom",
+      "refersTo": "button-sos",
+      "description": "Signature: the 72px round SOS over the map with the Call 112 pill above; pulses when an active SOS is hidden.",
+      "html": "<div class=\"ds-dock\"><a class=\"ds-112\" href=\"#\">Call 112</a><button class=\"ds-fab\" aria-label=\"Send SOS\">SOS</button><button class=\"ds-fab is-active\" aria-label=\"SOS active: show details\">SOS</button></div>",
+      "css": ".ds-dock{display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:Geist,system-ui,sans-serif}.ds-112{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid rgb(248 113 113 / .45);border-radius:999px;background:rgb(21 19 31 / .92);backdrop-filter:blur(10px);box-shadow:0 10px 24px -12px rgb(0 0 0 / .8);color:#ffb4b4;font-size:.875rem;font-weight:700;text-decoration:none}.ds-112:hover{background:rgb(248 113 113 / .12)}.ds-fab{position:relative;display:grid;place-items:center;width:72px;height:72px;padding:0;border:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ef4444,#dc2626 70%);box-shadow:0 14px 30px -10px rgb(220 38 38 / .9),inset 0 2px 0 rgb(255 255 255 / .22),0 0 0 5px rgb(220 38 38 / .18);color:#fff;font:800 1.1rem Geist,system-ui,sans-serif;letter-spacing:.06em;cursor:pointer;transition:transform 150ms cubic-bezier(.16,1,.3,1)}.ds-fab:active{transform:scale(.94)}.ds-fab:focus-visible,.ds-112:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}.ds-fab.is-active::after{content:'';position:absolute;inset:-6px;border:3px solid #f87171;border-radius:50%;animation:ds-pl 1.6s ease-out infinite}@keyframes ds-pl{from{opacity:.9;transform:scale(.92)}to{opacity:0;transform:scale(1.35)}}@media (prefers-reduced-motion:reduce){.ds-fab.is-active::after{animation:none;opacity:0}}"
+    },
+    {
+      "name": "SOS Countdown",
+      "kind": "custom",
+      "refersTo": "button-sos-confirm",
+      "description": "Signature: full-screen red countdown with an emptying 190px ring, Cancel above Send now.",
+      "html": "<div class=\"ds-cd\" style=\"--left:.8\"><p>Sending SOS in</p><div class=\"ds-ring\">4</div><button class=\"ds-cancel\">Cancel</button><button class=\"ds-send\">Send now</button></div>",
+      "css": ".ds-cd{display:grid;justify-items:center;gap:12px;padding:24px 16px;background:radial-gradient(circle at 50% 40%,rgb(220 38 38 / .5),rgb(8 6 16 / .94) 70%);color:#eeeaf7;text-align:center;font-family:Geist,system-ui,sans-serif}.ds-cd p{margin:0;font-size:1.35rem;font-weight:700}.ds-ring{position:relative;display:grid;place-items:center;width:190px;height:190px;font-size:4.5rem;font-weight:750;line-height:1;font-variant-numeric:tabular-nums}.ds-ring::before{content:'';position:absolute;inset:0;border-radius:50%;background:conic-gradient(#fff calc(var(--left) * 360deg),rgb(255 255 255 / .14) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px))}.ds-cancel,.ds-send{width:min(100%,300px);min-height:52px;border-radius:9px;font:650 1rem Geist,system-ui,sans-serif;cursor:pointer}.ds-cancel{border:1px solid #3b3557;background:#1d1a2b;color:#eeeaf7}.ds-send{border:0;background:#dc2626;color:#fff}.ds-send:hover{background:#b91c1c}.ds-cancel:focus-visible,.ds-send:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
+    },
+    {
+      "name": "Trip Check-in",
+      "kind": "card",
+      "refersTo": "overlay-card",
+      "description": "Signature: red-edged overlay card asking \"Are you OK?\" with reason, consequence and a focused I'm OK.",
+      "html": "<div class=\"ds-ci\"><h2>Are you OK?</h2><p>No location has reached the server for 15 minutes. If you don't answer soon, Mum will be told.</p><button>I'm OK</button></div>",
+      "css": ".ds-ci{max-width:440px;padding:22px;border:1px solid #f87171;border-radius:22px;background:#17141f;box-shadow:0 30px 60px -24px rgb(0 0 0 / .85);color:#eeeaf7;font-family:Geist,system-ui,sans-serif}.ds-ci h2{margin:0 0 6px;font-size:1.5rem;letter-spacing:-.02em}.ds-ci p{margin:0 0 16px;color:#b0a9c6}.ds-ci button{width:100%;min-height:52px;border:0;border-radius:9px;background:#7c3aed;color:#fff;font:650 1.05rem Geist,system-ui,sans-serif;cursor:pointer;transition:background-color 150ms ease}.ds-ci button:hover{background:#6d28d9}.ds-ci button:focus-visible{outline:none;box-shadow:0 0 0 3px rgb(167 139 250 / .55)}"
     }
   ],
   "narrative": {
     "northStar": "The Status Instrument",
-    "overview": "Safe Location reads like an instrument panel on a dark violet night, not a dashboard of equal cards. One live panel answers \"am I being recorded, and is it reaching anyone?\" before anything else: a single condition band carries the overall tone in one plain sentence, a large state line names what is happening, and a ruled grid of label-over-value readouts gives the evidence. Everything else (map, trip, recording settings, backup, details, history) sits below or beside it at lower weight.\n\nDensity is moderate and calm. Panels are charcoal-violet sheets divided by hairline rules rather than stacks of floating cards; colour is almost entirely neutral until something needs a person's attention, and then it appears in exactly one place, with one meaning. The face is Geist, self-hosted and small (29 KB for Latin), so the product reads like a modern SaaS tool without a font service; text shows at once in the system font and swaps when Geist arrives. Behind everything lies the signal field: soft violet light falling from the top of the screen with a faint pink glow at one corner, a point grid like a map graticule, and fine grain.\n\nMotion follows a budget. The tracker stays open for hours on a phone battery, so it is nearly still: colour changes ease over 400ms and the only thing that moves on its own is the breathing dot while recording is healthy. Motion lives on the short-visit pages: the sign-in veil breathes, and the public landing page at /welcome (a Persuade-mode page in the same world) drifts an aurora and animates a preview of the real tracker.\n\nThe world is honest about uncertainty. Readings show their age and accuracy in tabular numerals, gaps are drawn as dashed lines, doubtful points are amber and left off the route, and nothing in the copy claims a message was delivered unless the provider confirmed it. The landing page's previews only show states the product really shows.",
+    "overview": "Safe Location is a map at night with an instrument laid over it. The map fills the screen and shows where you have been; the instrument answers \"am I being recorded, and is it reaching anyone?\" in two places that never scroll away: a floating status pill that carries the overall tone in one short line, and the top of the sheet, where a large state line, the next-reading countdown, an event message and the main actions sit. Readings, trip, history and settings live further down the same sheet at lower weight. SOS floats on the map in thumb reach, red and round, with Call 112 above it.\n\nDensity is moderate and calm. The sheet is one charcoal-violet surface divided by hairline rules rather than a stack of floating cards; colour is almost entirely neutral until something needs a person's attention, and then it appears in exactly one place, with one meaning. The face is Geist, self-hosted and small (29 KB for Latin), so the product reads like a modern SaaS tool without a font service; text shows at once in the system font and swaps when Geist arrives. The tracker's ground is now the dark map itself, tinted violet-black; the signal field (violet light from above, pink corner glow, point grid, grain) remains the ground of the account, sign-in and landing pages.\n\nMotion follows a budget. The tracker stays open for hours on a phone battery, so it moves only to say something: the sheet slides, the pill changes tone, the status dot breathes while recording is healthy, the latest-position marker pings, and a hidden active SOS pulses so it is never forgotten. Nothing drifts in the background. Ambient motion lives on the short-visit pages: the sign-in veil breathes, and the public landing page at /welcome (a Persuade-mode page in the same world) drifts an aurora and animates a preview of the real tracker.\n\nThe world is honest about uncertainty. Readings show their age and accuracy in tabular numerals, gaps are drawn as dashed lines, doubtful points are amber and left off the route, and nothing in the copy claims a message was delivered unless the provider confirmed it. The landing page's previews only show states the product really shows.",
     "keyCharacteristics": [
-      "One tone-carrying condition band per screen, driven by state (idle grey, calm violet, attention amber, alert red).",
-      "Hairline-ruled grids and sheets with ruled sections instead of card stacks.",
+      "Map first: a full-screen dark map on phones, a 400px panel beside the map on computers.",
+      "One tone-carrying status pill per screen, driven by state (idle grey, calm violet, attention amber, alert red).",
+      "One sheet of hairline-ruled sections instead of card stacks; peek, half and full heights on phones.",
       "Violet means working, amber means attention, red means emergency, failure or irreversible removal.",
-      "Geist (self-hosted, system fallback), weights 600 to 750, tabular numerals for every reading.",
-      "The signal field background: violet light from above, a pink side glow, a fading point grid, grain. CSS only.",
-      "Flat, bordered surfaces in the tracker; depth only on map controls and markers.",
-      "A tall red SOS always within thumb reach, with \"Call 112\" under it.",
-      "Motion budget: the tracker nearly still, motion on the landing and sign-in pages, all of it off under reduced motion."
+      "Geist (self-hosted, system fallback), weights 600 to 800, tabular numerals for every reading.",
+      "Flat, bordered surfaces inside the sheet; soft shadow only on things that float over the map.",
+      "A round red SOS always one tap away, with Call 112 beside it.",
+      "Motion budget: tracker motion only to carry state, ambient motion on the landing and sign-in pages, all of it off under reduced motion."
     ],
     "rules": [
       {
@@ -800,8 +920,13 @@
         "section": "typography"
       },
       {
-        "name": "The Instrument First Rule",
-        "body": "On every viewport the condition band, state line and readouts come before the map, with SOS beside them within thumb reach.",
+        "name": "The Status First Rule",
+        "body": "On every viewport the status pill and the peek sheet's state line and actions are visible without scrolling, and SOS and Call 112 are always one tap away: floating on the map, or pinned at the top of the sheet when it is full.",
+        "section": "layout"
+      },
+      {
+        "name": "The Map Stays Clear Rule",
+        "body": "Only the status pill, Recenter, the SOS dock and transient notices float over the map. Everything else lives in the sheet; floating controls step aside when the sheet rises.",
         "section": "layout"
       },
       {
@@ -810,27 +935,34 @@
         "section": "elevation"
       },
       {
+        "name": "The Float Only Over The Map Rule",
+        "body": "Shadow and blur belong to things that float over the map and to overlay cards. Nothing inside the sheet casts a shadow.",
+        "section": "elevation"
+      },
+      {
         "name": "The Motion Budget Rule",
-        "body": "The tracker stays nearly still because it runs for hours on a phone battery: only the calm-tone breathing dot, the map spinner and short colour transitions. Ambient motion belongs to short-visit pages (sign-in, landing). Everywhere, `prefers-reduced-motion: reduce` stops every animation, and content never depends on motion to be visible.",
+        "body": "The tracker runs for hours on a phone battery, so it moves only to carry state: the sheet sliding (420ms, cubic-bezier(0.16, 1, 0.3, 1)), the pill's tone easing over 400ms, the breathing dot while recording is healthy (2.4s), the latest-marker ping (2.4s), the pulse on a hidden active SOS and the live-SOS dot (1.6s), the countdown ring emptying, overlays fading in (200ms) and rising (320ms). No ambient background motion. Everywhere, `prefers-reduced-motion: reduce` stops every animation and transition, and content never depends on motion to be visible.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** let one condition band per screen carry the overall tone, with a plain sentence that names what is happening.",
+      "**Do** let one status pill per screen carry the overall tone, with a short line on screen and the full plain sentence for screen readers.",
+      "**Do** keep the state line and the main actions inside the sheet's peek height, and SOS and Call 112 one tap away at every sheet height.",
       "**Do** use Working Violet for working state, Attention Amber for attention, and red only for emergency, failure and irreversible removal.",
       "**Do** keep Aurora Pink as light only: field glows, aurora, rail ends; never a fill, text colour or state.",
       "**Do** set every live reading in tabular numerals at 650 weight, label over value, on a hairline-ruled grid.",
-      "**Do** group related sections into one sheet divided by 1px hairlines.",
+      "**Do** group related sections into one sheet divided by 1px hairlines, and keep everything but the status pill, Recenter and SOS off the map.",
       "**Do** keep primary controls at least 44px tall and keep accessible names when a label is visually hidden.",
-      "**Do** honour reduced motion everywhere: stop the breathing dot, spinner, veil, aurora, previews and colour transitions, and keep content visible without motion or JavaScript.",
+      "**Do** honour reduced motion everywhere: stop the sheet slide, tone transitions, breathing dot, marker ping, SOS pulses, overlay entrances, spinner, veil, aurora and previews, and keep content visible without motion or JavaScript.",
       "**Do** make landing previews show only states the product really shows, in the same honest delivery language.",
       "**Do** show age and accuracy with every location and say \"simulated\" or \"submitted\" until a provider confirms delivery."
     ],
     "donts": [
       "**Don't** use red for a doubtful reading such as a GPS jump or low accuracy; that is amber.",
-      "**Don't** add ambient motion to the tracker; the breathing dot in the calm tone is the only thing that moves there on its own. Motion belongs to the landing and sign-in pages.",
+      "**Don't** add ambient background motion to the tracker; motion there only carries state (sheet, tone, recording, latest position, live SOS). Ambient motion belongs to the landing and sign-in pages.",
       "**Don't** add eyebrows or kickers (small uppercase labels above headings); section titles stand alone in sentence case.",
-      "**Don't** stack shadowed, same-weight cards where a ruled sheet will do, and don't carry landing glows and shadows into the tracker.",
+      "**Don't** stack shadowed, same-weight cards where a ruled sheet will do; shadows belong only to things floating over the map and to overlay cards, and landing glows stay on the landing.",
+      "**Don't** put more controls on the map (zoom buttons on phones, layer switchers, extra floating buttons); they go in the sheet.",
       "**Don't** add font services, a second family or icon fonts; use self-hosted Geist and inline SVG icons.",
       "**Don't** claim a message was delivered, or that someone is safe or in danger, without provider confirmation or the person's own action.",
       "**Don't** fabricate streets, routes, accuracy or results to fill an empty state; say what is unknown."

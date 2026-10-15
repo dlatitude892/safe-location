@@ -223,102 +223,6 @@ svg { flex: 0 0 auto; }
   font-weight: 600;
 }
 
-/* ---------- Layout ----------
-   Wide screens: the instrument across the top of the main column with SOS beside it, the map under it,
-   and a rail (trip, recording, backup) on the right. Phones: instrument and a narrow SOS column side by
-   side, then the map, then everything else. */
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 27vw, 380px);
-  grid-template-areas:
-    "instrument sos"
-    "map rail"
-    "details rail"
-    "history history";
-  grid-template-rows: auto auto 1fr auto; /* a tall rail adds space under the details, not above them */
-  align-items: start;
-  gap: 1rem;
-  width: min(100% - 2rem, 1440px);
-  margin: 1.25rem auto 0;
-}
-
-.instrument { grid-area: instrument; align-self: stretch; }
-.sos-card { grid-area: sos; align-self: stretch; }
-/* The map fills what is left of the window under the instrument. */
-.map-card { grid-area: map; height: clamp(420px, calc(100vh - 360px), 760px); }
-/* Wide screens: the rail is never taller than the window and scrolls inside itself, so a long section (like
-   the trip form) can't stretch the map column and leave empty space beside it. */
-.rail {
-  grid-area: rail;
-  align-self: stretch;
-  max-height: calc(100vh - 96px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-strong) transparent;
-}
-.details-sheet { grid-area: details; }
-.history-card { grid-area: history; }
-
-/* ---------- Instrument: the live status panel ---------- */
-.instrument {
-  --tone: var(--text-faint);
-  --tone-text: var(--text-muted);
-  --tone-soft: var(--surface-raised);
-  --tone-edge: var(--border);
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  border: 1px solid var(--tone-edge);
-  border-radius: var(--radius);
-  background: var(--panel-sheen), var(--surface);
-  box-shadow: var(--panel-edge), 0 18px 48px -24px rgb(0 0 0 / 0.6);
-  overflow: hidden;
-  transition: border-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.instrument[data-tone="calm"] { --tone: var(--accent); --tone-text: var(--accent-text); --tone-soft: rgb(139 92 246 / 0.13); --tone-edge: rgb(139 92 246 / 0.5); }
-.instrument[data-tone="attention"] { --tone: var(--warning); --tone-text: var(--warning); --tone-soft: rgb(245 181 68 / 0.12); --tone-edge: rgb(245 181 68 / 0.55); }
-.instrument[data-tone="alert"] { --tone: var(--danger); --tone-text: #ffc4c4; --tone-soft: rgb(220 38 38 / 0.2); --tone-edge: var(--danger); }
-
-/* The condition band: one sentence that carries the overall tone. */
-.condition {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  min-height: 2.75rem;
-  padding: 0.55rem 1.1rem;
-  border-bottom: 1px solid var(--tone-edge);
-  background: var(--tone-soft);
-  color: var(--tone-text);
-  font-size: 0.9rem;
-  font-weight: 650;
-  line-height: 1.35;
-  transition: background-color 400ms cubic-bezier(0.16, 1, 0.3, 1), color 400ms cubic-bezier(0.16, 1, 0.3, 1), border-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.condition-dot {
-  position: relative;
-  flex: 0 0 auto;
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--tone);
-  transition: background-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-/* While recording normally, the dot breathes: the one moving thing on the page. */
-.instrument[data-tone="calm"] .condition-dot::after {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid var(--tone);
-  animation: breathe 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-@keyframes breathe { from { opacity: 0.7; transform: scale(0.6); } to { opacity: 0; transform: scale(1.6); } }
-
-.instrument-body { padding: 1rem 1.1rem 0; }
-.instrument-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 1rem; }
-.instrument-state { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
-.instrument-next { color: var(--text-muted); font-size: 0.92rem; font-variant-numeric: tabular-nums; }
-
 /* Readouts: label over value on a ruled grid. Hairlines are the grid's gap showing the border colour. */
 .readouts {
   display: grid;
@@ -349,14 +253,6 @@ svg { flex: 0 0 auto; }
 .readout.is-error dd { color: #ffb4b4; }
 .readout.is-error .pill-dot { background: var(--danger); }
 
-.instrument .message { margin: 0; padding: 0.75rem 1.1rem 0; }
-.instrument .message:empty { display: none; }
-.instrument-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 0.75rem 1.1rem 1.1rem; margin-top: auto; }
-.instrument-actions .button { flex: 1 1 11rem; min-height: 50px; font-size: 1rem; }
-.instrument-trip { display: grid; flex: 1 1 100%; gap: 0.4rem; }
-.instrument-trip .button { min-height: 50px; font-size: 1rem; }
-#trip-card, .instrument { scroll-margin-top: 76px; } /* clear of the sticky header */
-
 /* ---------- Sheets: one panel, ruled sections (the rail and the details) ---------- */
 .sheet {
   min-width: 0;
@@ -368,8 +264,6 @@ svg { flex: 0 0 auto; }
 .sheet-section { min-width: 0; padding: 1.1rem; }
 .sheet-section + .sheet-section { border-top: 1px solid var(--border); }
 .sheet-section .field:first-of-type { margin-top: 0; }
-.details-sheet { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.details-sheet .sheet-section + .sheet-section { border-top: 0; border-left: 1px solid var(--border); }
 
 .card {
   min-width: 0;
@@ -451,19 +345,6 @@ svg { flex: 0 0 auto; }
 .message.is-success { color: var(--accent-text); font-weight: 600; }
 
 /* ---------- Map ---------- */
-.map-card { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
-
-.map-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem 1rem;
-  padding: 0.75rem 0.9rem;
-  border-bottom: 1px solid var(--border);
-}
-.toolbar-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
-
 .segmented {
   display: inline-flex;
   margin: 0;
@@ -518,10 +399,10 @@ svg { flex: 0 0 auto; }
 .switch input:checked ~ span:last-child { color: var(--text); }
 .switch input:focus-visible + .switch-track { box-shadow: var(--focus); }
 
-.map-frame { position: relative; flex: 1 1 auto; min-height: 360px; }
+.map-frame { position: absolute; inset: 0; }
 #map { position: absolute; inset: 0; background: #120f1d; }
 /* "Dark" map style: the same OpenStreetMap tiles recoloured in the browser. */
-.tiles-dark { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(88%) saturate(70%); }
+.tiles-dark { filter: invert(1) grayscale(1) sepia(0.5) hue-rotate(210deg) saturate(1.7) brightness(0.68) contrast(1.08); }
 
 .map-overlay {
   position: absolute;
@@ -867,10 +748,6 @@ code { font-size: 0.92em; }
 }
 
 /* ---------- Emergency SOS (Phase 5) ---------- */
-.sos-card { display: flex; flex-direction: column; border-color: rgb(248 113 113 / 0.35); }
-/* Call 112 sits at the bottom of the card, however tall the row is. */
-.sos-card > div, .sos-card > .sos-message { margin-bottom: 1rem; }
-.sos-card .call-112 { margin-top: auto; }
 .sos-word { display: none; }
 .sos-ready-short { display: none; }
 .button-sos {
@@ -960,14 +837,6 @@ code { font-size: 0.92em; }
 .trip-badge.is-checkin-requested { border-color: var(--danger); background: var(--danger-soft); color: #ffb4b4; }
 .trip-badge.is-completed, .trip-badge.is-cancelled { color: var(--text-muted); }
 #trip-state-text { margin: 0.5rem 0 0.75rem; }
-.trip-checkin {
-  margin-bottom: 0.9rem;
-  padding: 0.75rem;
-  border: 1px solid var(--danger);
-  border-radius: var(--radius-sm);
-  background: var(--danger-soft);
-}
-.trip-checkin p { margin-bottom: 0.6rem; font-weight: 600; }
 .trip-cancel { margin-top: 0.6rem; }
 .trip-card .sync-overview dd { max-width: 60%; }
 
@@ -986,115 +855,588 @@ code { font-size: 0.92em; }
   font-size: 0.78rem;
 }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 1180px) {
-  .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (prefers-reduced-motion: reduce) {
+  .button, .switch-track, .switch-track::after { transition: none; }
+  .auth-body::before { animation: none; }
+  /* The spinner stops; the "Loading map..." text still shows the state. */
+  .spinner { animation: none; border-top-color: var(--border-strong); }
 }
 
-/* Tablets and phones: instrument and SOS side by side, then the map, then the rest in one column. */
-@media (max-width: 900px) {
-  .layout {
-    grid-template-columns: minmax(0, 1fr) clamp(6.75rem, 30vw, 15rem);
-    grid-template-rows: none;
-  }
-  .rail { max-height: none; overflow: visible; } /* one column: the page scrolls instead */
-  .layout {
-    grid-template-areas:
-      "instrument sos"
-      "map map"
-      "rail rail"
-      "details details"
-      "history history";
-  }
-  /* While an SOS is being sent or is active, it takes the full width under the instrument. */
-  .layout.sos-wide {
-    grid-template-areas:
-      "instrument instrument"
-      "sos sos"
-      "map map"
-      "rail rail"
-      "details details"
-      "history history";
-  }
-  .map-card { height: auto; }
-  .map-frame { flex: 0 0 auto; height: max(320px, 46vh); min-height: 0; }
+/* ==========================================================================
+   Map-first tracker (Phase 8)
+   Phones: a full-screen map with the top bar, map controls and SOS floating over it, and one sheet that
+   slides up from the bottom (peek, half, full). Computers (960px and wider): the sheet is a panel on the
+   left and the map fills the rest. The shell never scrolls; only the sheet's content does.
+   ========================================================================== */
+.tracker-body {
+  --sheet-bg: #17141f;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --top-inset: env(safe-area-inset-top, 0px);
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+html:has(.tracker-body) { height: 100%; overflow: hidden; }
+.tracker-body::before, .tracker-body::after { display: none; } /* the map is the background here */
+
+.app-shell {
+  --panel-w: 400px;
+  --sheet-visible: 0px; /* how much of the map the sheet covers (set by app.js) */
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overflow: clip; /* never scrolls, even when something asks to be scrolled into view */
+}
+.visually-hidden-sm { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Map ---------- */
+.map-area { position: absolute; inset: 0; z-index: 0; isolation: isolate; overflow: clip; }
+.map-area .leaflet-top { top: calc(var(--top-inset) + 64px); }
+.map-area .leaflet-bottom { bottom: var(--dock-bottom, var(--sheet-visible)); transition: bottom 420ms var(--ease-out); }
+.tracker-body .map-alert { top: calc(var(--top-inset) + 72px); }
+
+.map-tools {
+  position: absolute;
+  top: calc(var(--top-inset) + 66px);
+  right: 12px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.map-tool { box-shadow: 0 8px 20px -10px rgb(0 0 0 / 0.8); }
+/* Phones: with the sheet raised the map is a strip, so its controls step aside for SOS. */
+.map-tools { transition: opacity 200ms ease, visibility 200ms; }
+.app-shell:is([data-sheet="half"], [data-sheet="full"]) .map-tools { visibility: hidden; opacity: 0; }
+.map-tools .button-ghost {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-color: var(--border-strong);
+  border-radius: 999px;
+  background: rgb(21 19 31 / 0.92);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.map-tools .button-ghost .button-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Disabled (no location yet): stays solid and readable over the map. */
+.map-tools .button-ghost:disabled { opacity: 1; color: var(--text-faint); }
+/* Phones: pinch to zoom; the + and - buttons would only add clutter. */
+@media (max-width: 959px) { .map-area .leaflet-control-zoom { display: none; } }
+
+/* ---------- Top bar: logo, status pill, account ---------- */
+.tracker-body .app-header.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  min-height: 0;
+  gap: 8px;
+  padding: calc(var(--top-inset) + 10px) 12px 10px;
+  border: 0;
+  background: linear-gradient(to bottom, rgb(11 10 20 / 0.75), rgb(11 10 20 / 0));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.topbar > * { pointer-events: auto; }
+.topbar .brand { flex: 0 0 auto; border-radius: 12px; }
+.topbar .brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.topbar .brand-mark { width: 44px; height: 44px; border-radius: 12px; }
+.topbar .header-status { flex: 0 0 auto; flex-wrap: nowrap; align-items: center; }
+.topbar .header-about { display: none; }
+.topbar .pill-link {
+  min-height: 44px;
+  padding: 0 14px;
+  border-color: var(--border-strong);
+  background: rgb(21 19 31 / 0.9);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-size: 0.85rem;
+}
+/* Phones: a signed-in account shows as initials in a round button (the full name is its accessible name). */
+.topbar .pill-link[data-initials] { justify-content: center; width: 44px; padding: 0; font-size: 0; }
+.topbar .pill-link[data-initials]::after { content: attr(data-initials); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.02em; }
+
+/* The status pill: one sentence and one tone for the most important thing right now. Tap for details. */
+.status-pill {
+  --tone: var(--text-faint);
+  --tone-text: var(--text-muted);
+  --tone-edge: var(--border-strong);
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--tone-edge);
+  border-radius: 999px;
+  background: rgb(21 19 31 / 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 26px -14px rgb(0 0 0 / 0.85);
+  color: var(--tone-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: border-color 400ms var(--ease-out), color 400ms var(--ease-out);
+}
+.status-pill[data-tone="calm"] { --tone: var(--accent); --tone-text: var(--accent-text); --tone-edge: rgb(139 92 246 / 0.6); }
+.status-pill[data-tone="attention"] { --tone: var(--warning); --tone-text: var(--warning); --tone-edge: rgb(245 181 68 / 0.6); }
+.status-pill[data-tone="alert"] { --tone: var(--danger); --tone-text: #ffb4b4; --tone-edge: var(--danger); background: rgb(48 14 22 / 0.92); }
+#condition-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#condition-text > span[aria-hidden] { display: block; overflow: hidden; text-overflow: ellipsis; }
+.pill-hit { position: absolute; inset: 0; width: 100%; padding: 0; border: 0; border-radius: inherit; background: none; cursor: pointer; }
+.condition-dot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--tone);
+  transition: background-color 400ms var(--ease-out);
+}
+/* While recording normally, the dot breathes: the one moving thing on the tracker. */
+.status-pill[data-tone="calm"] .condition-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--tone);
+  animation: breathe 2.4s var(--ease-out) infinite;
+}
+@keyframes breathe { from { opacity: 0.7; transform: scale(0.6); } to { opacity: 0; transform: scale(1.6); } }
+
+.tracker-body .notice-bar {
+  position: absolute;
+  top: calc(var(--top-inset) + 64px);
+  left: 12px;
+  right: 64px;
+  z-index: 31;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid rgb(245 181 68 / 0.45);
+  border-radius: 12px;
+  background: rgb(26 22 12 / 0.95);
 }
 
-@media (max-width: 720px) {
-  .layout {
-    width: min(100% - 1.25rem, 1440px);
-    gap: 0.625rem;
-    margin-top: 0.625rem;
-  }
-  .details-sheet { grid-template-columns: minmax(0, 1fr); }
-  .details-sheet .sheet-section + .sheet-section { border-left: 0; border-top: 1px solid var(--border); }
-  .app-header { min-height: 56px; }
-  .brand span { font-size: 0.98rem; }
-  .pill { padding: 0.25rem 0.55rem; font-size: 0.75rem; }
-  .toolbar-controls { width: 100%; }
-  .toolbar-controls .button-ghost { flex: 1 1 auto; min-height: 44px; }
-  .segmented label { display: inline-flex; align-items: center; min-height: 40px; padding-inline: 1rem; }
-  .switch { min-height: 44px; }
-  .history-entry { grid-template-columns: minmax(0, 1fr) auto; }
-  .history-coordinates { grid-column: 1 / -1; grid-row: 2; }
-  .history-badges { justify-content: flex-end; }
+/* ---------- The sheet ---------- */
+.tracker-body .sheet {
+  --sheet-y: calc(100% - 240px);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - var(--top-inset) - 64px);
+  border: 0;
+  border-top: 1px solid var(--border-strong);
+  border-radius: 22px 22px 0 0;
+  background: linear-gradient(180deg, rgb(196 181 253 / 0.05), transparent 140px), var(--sheet-bg);
+  box-shadow: 0 -18px 40px -18px rgb(0 0 0 / 0.75), var(--panel-edge);
+  transform: translateY(var(--sheet-y));
+  transition: transform 420ms var(--ease-out);
+  will-change: transform;
 }
+.tracker-body .sheet.is-dragging { transition: none; }
+.sheet-grab {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 22px 22px 0 0;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+}
+.sheet-grab span { width: 40px; height: 5px; border-radius: 3px; background: var(--border-strong); transition: background-color 150ms ease; }
+.sheet-grab:hover span { background: var(--control-border); }
+.sheet-body {
+  position: relative; /* offsets inside the sheet are measured from here */
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+.sheet-body:focus { outline: none; }
+
+.sheet-emergency { display: none; }
+.app-shell[data-sheet="full"] .sheet-emergency {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 6px 18px 10px;
+  background: var(--sheet-bg);
+}
+.sheet-sos, .call-112-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.sheet-sos { border: 0; background: var(--danger-strong); color: #fff; letter-spacing: 0.05em; cursor: pointer; }
+.call-112-mini { border: 1px solid rgb(248 113 113 / 0.45); color: #ffb4b4; }
+.app-shell[data-sheet="full"] .sos-card:not(.is-open) { visibility: hidden; }
+.sheet-status { padding: 2px 18px 18px; }
+.instrument-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.25rem 1rem; }
+.instrument-state { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+.instrument-next { color: var(--text-muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.sheet-status .message { min-height: 0; margin-top: 0.45rem; font-size: 0.88rem; }
+.sheet-status .message:empty { display: none; }
+.sheet-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.sheet-actions .button { flex: 1 1 9rem; min-height: 50px; border-radius: 14px; font-size: 1rem; }
+.instrument-trip { display: grid; flex: 1 1 100%; gap: 0.4rem; }
+.trip-buttons { display: flex; gap: 10px; }
+.trip-buttons .button { flex: 1 1 0; min-height: 50px; border-radius: 14px; font-size: 1rem; }
+.trip-more { margin-top: 1rem; border-top: 1px solid var(--border); }
+.trip-more summary { display: flex; align-items: center; min-height: 44px; color: var(--accent-text); cursor: pointer; font-size: 0.92rem; font-weight: 600; }
+.trip-more[open] summary { margin-bottom: 0.25rem; }
+.history-tools { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.history-tools .button-ghost { min-height: 38px; }
+.map-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 1rem; }
+.map-settings .segmented label { display: inline-flex; align-items: center; min-height: 40px; padding-inline: 1rem; }
+.map-settings .switch { min-height: 44px; }
+#peek-end { height: 0; }
+.tracker-body .readouts { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 16px; }
+
+.tracker-body .sheet-section { padding: 18px; border-top: 1px solid var(--border); }
+.tracker-body .sheet-section .card-heading { margin-bottom: 0.75rem; }
+.legend-card .map-legend { padding: 0; border-top: 0; }
+.tracker-body .app-footer { width: auto; margin: 0; padding: 18px; border-top: 1px solid var(--border); color: var(--text-faint); font-size: 0.78rem; }
+.tracker-body .history-entry { grid-template-columns: minmax(0, 1fr) auto; }
+.tracker-body .history-coordinates { grid-column: 1 / -1; grid-row: 2; }
+.tracker-body .history-badges { justify-content: flex-end; }
+
+/* ---------- SOS on the map ---------- */
+.sos-word, .sos-ready-short { display: none; }
+.sos-card {
+  position: absolute;
+  right: 12px;
+  bottom: calc(var(--dock-bottom, var(--sheet-visible)) + 14px);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: calc(100% - 24px);
+  pointer-events: none;
+  transition: bottom 420ms var(--ease-out);
+}
+.sos-card > *, .sos-card .sos-panel > * { pointer-events: auto; }
+.sos-card:not(.is-open) .sos-panel { display: contents; }
+.sos-card:not(.is-open) :is(.sos-head, #sos-unavailable, #sos-countdown, #sos-sending, #sos-queued, #sos-active, .sos-disclaimer) { display: none !important; }
+.sos-card:not(.is-open) .sos-message {
+  order: 1;
+  max-width: 260px;
+  margin: 0;
+  padding: 9px 13px;
+  border: 1px solid rgb(245 181 68 / 0.45);
+  border-radius: 12px;
+  background: rgb(26 22 12 / 0.95);
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.8);
+  font-size: 0.85rem;
+}
+.sos-card:not(.is-open) .call-112 {
+  order: 2;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgb(21 19 31 / 0.92);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.8);
+  font-size: 0.875rem;
+}
+.sos-card:not(.is-open) .call-112-lead,
+.sos-card:not(.is-open) .sos-ready-text,
+.sos-card:not(.is-open) #sos-button .sos-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sos-card:not(.is-open) #sos-ready { order: 3; }
+.sos-fab { order: 3; }
+.sos-card:not(.is-open) #sos-button,
+.sos-fab {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  min-height: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ef4444, var(--danger-strong) 70%);
+  box-shadow: 0 14px 30px -10px rgb(220 38 38 / 0.9), inset 0 2px 0 rgb(255 255 255 / 0.22), 0 0 0 5px rgb(220 38 38 / 0.18);
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  transition: transform 150ms var(--ease-out);
+}
+.sos-card:not(.is-open) #sos-button:active, .sos-fab:active { transform: scale(0.94); }
+.sos-card:not(.is-open) #sos-button .sos-word { display: block; }
+/* An active SOS that's been hidden keeps pulsing, so it's never forgotten. */
+.sos-fab.is-active::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 3px solid var(--danger);
+  border-radius: 50%;
+  animation: sos-pulse 1.6s ease-out infinite;
+}
+@keyframes sos-pulse { from { opacity: 0.9; transform: scale(0.92); } to { opacity: 0; transform: scale(1.35); } }
+
+/* Open: the SOS panel comes up over the map. */
+.sos-card.is-open {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: end center;
+  max-width: none;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgb(8 6 16 / 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+  transition: none;
+  animation: fade-in 200ms ease-out;
+}
+.sos-card.is-open .sos-panel {
+  display: block;
+  width: min(100%, 440px);
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid rgb(248 113 113 / 0.45);
+  border-radius: 22px;
+  background: var(--sheet-bg);
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.85);
+  animation: rise-in 320ms var(--ease-out);
+}
+.sos-card.is-open .sos-panel > div:not(.sos-head) { margin-bottom: 1rem; }
+.sos-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.sos-head h2 { margin-right: auto; font-size: 1.15rem; }
+.sos-close { min-height: 40px; }
+.sos-card.is-open .call-112 { margin-top: 0; }
+/* The countdown takes the whole screen in red: a big number and two clear choices. */
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) {
+  place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgb(220 38 38 / 0.5), rgb(8 6 16 / 0.94) 70%);
+}
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) .sos-panel {
+  border-color: transparent;
+  background: none;
+  box-shadow: none;
+  text-align: center;
+}
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) .sos-head { justify-content: center; }
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) .sos-head h2 { margin-right: 0; }
+.sos-card.is-open[data-view="countdown"] .sos-count { font-size: 1.35rem; }
+.sos-card.is-open[data-view="countdown"] .sos-ellipsis { display: none; }
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) .sos-head { display: none; }
+.sos-card.is-open[data-view="countdown"] #sos-seconds {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 190px;
+  height: 190px;
+  margin: 18px auto 14px;
+  font-size: 4.5rem;
+  font-weight: 750;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+/* The ring empties as the seconds run out. */
+.sos-card.is-open[data-view="countdown"] #sos-seconds::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(#fff calc(var(--sos-left, 1) * 360deg), rgb(255 255 255 / 0.14) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  transition: --sos-left 1s linear;
+}
+.sos-card.is-open[data-view="countdown"] #sos-fix-status { color: #f3d0d0; font-size: 0.875rem; }
+.sos-card.is-open[data-view="countdown"] .inline-actions { flex-direction: column; align-items: center; }
+.sos-card.is-open[data-view="countdown"] .inline-actions .button { flex: 0 0 auto; width: min(100%, 300px); min-height: 52px; }
+.sos-card.is-open:is([data-view="countdown"], [data-view="sending"]) .call-112 { width: min(100%, 300px); margin-inline: auto; }
+@property --sos-left { syntax: "<number>"; inherits: true; initial-value: 1; }
+
+/* ---------- Trip check-in: asked over everything ---------- */
+.checkin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: end center;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: rgb(8 6 16 / 0.75);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: fade-in 200ms ease-out;
+}
+.checkin-card {
+  width: min(100%, 440px);
+  padding: 22px;
+  border: 1px solid var(--danger);
+  border-radius: 22px;
+  background: var(--sheet-bg);
+  box-shadow: 0 30px 60px -24px rgb(0 0 0 / 0.85);
+  animation: rise-in 320ms var(--ease-out);
+}
+.checkin-title { margin: 12px 0 6px; font-size: 1.5rem; letter-spacing: -0.02em; }
+#trip-checkin-text { margin-bottom: 16px; color: var(--text-muted); }
+#trip-checkin-ok { min-height: 52px; font-size: 1.05rem; }
+
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(24px); } }
 
 @media (max-width: 340px) {
   .details, .stats { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Phones: the SOS column is narrow, so it shows a tall button, a short summary and "Call 112".
-   The full sentences stay available to screen readers (the button's description) and show again
-   when the SOS card goes full width. */
-@media (max-width: 560px) {
-  .instrument-body { padding: 0.85rem 0.85rem 0; }
-  .condition { padding: 0.5rem 0.85rem; font-size: 0.86rem; }
-  .instrument .message { padding: 0.65rem 0.85rem 0; font-size: 0.84rem; }
-  .instrument-actions { padding: 0.7rem 0.85rem 0.85rem; gap: 0.5rem; }
-  .instrument-actions .button { flex-basis: 100%; }
-  .instrument-next { font-size: 0.84rem; }
-  .readout { padding: 0.5rem 0.6rem 0.55rem; }
+/* ---------- Computers: the sheet becomes a panel on the left ---------- */
+@media (min-width: 960px) {
+  .map-area { left: var(--panel-w); }
+  .map-area .leaflet-top { top: 76px; }
+  .map-area .leaflet-bottom { bottom: 0; }
+  .tracker-body .map-alert { top: 84px; }
+  .map-tools { top: 16px; right: 16px; }
+  .map-tools .button-ghost { width: auto; padding: 0 16px; }
+  .map-tools .button-ghost .button-label { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
 
-  .map-toolbar { flex-wrap: nowrap; gap: 0.5rem; padding: 0.6rem; }
-  .map-toolbar h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .toolbar-controls { flex-wrap: nowrap; justify-content: space-between; gap: 0.4rem; }
-  .segmented label { padding-inline: 0.75rem; }
-  .switch { padding: 0; }
-  .toolbar-controls .button-ghost { flex: 0 0 44px; width: 44px; padding: 0; }
-  .button-ghost .button-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .readout dd { font-size: 0.9rem; }
-
-  .layout:not(.sos-wide) .sos-card { padding: 0.6rem; text-align: center; }
-  .layout:not(.sos-wide) .sos-card .card-heading { justify-content: center; margin-bottom: 0.5rem; }
-  .layout:not(.sos-wide) .sos-card .card-heading h2 { font-size: 0.9rem; }
-  .layout:not(.sos-wide) .sos-settings,
-  .layout:not(.sos-wide) .sos-ready-text,
-  .layout:not(.sos-wide) .sos-disclaimer,
-  .layout:not(.sos-wide) .call-112-lead {
-    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  .tracker-body .app-header.topbar {
+    right: auto;
+    width: var(--panel-w);
+    height: 72px;
+    padding: 0 18px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--sheet-bg);
+    pointer-events: auto;
   }
-  .layout:not(.sos-wide) #sos-ready { display: flex; flex: 1 1 auto; flex-direction: column; margin-bottom: 0.6rem; }
-  .layout:not(.sos-wide) #sos-ready[hidden] { display: none; }
-  .layout:not(.sos-wide) #sos-button { flex: 1 1 auto; flex-direction: column; gap: 0.15rem; min-height: 9rem; padding: 0.75rem 0.25rem; }
-  .layout:not(.sos-wide) .sos-word { display: block; font-size: 1.85rem; font-weight: 800; letter-spacing: 0.04em; line-height: 1; }
-  .layout:not(.sos-wide) .sos-label { font-size: 0.78rem; font-weight: 650; opacity: 0.92; }
-  .layout:not(.sos-wide) .sos-ready-short { display: block; margin-top: 0.45rem; font-size: 0.74rem; line-height: 1.3; }
-  .layout:not(.sos-wide) #sos-unavailable { margin-bottom: 0.6rem; }
-  .layout:not(.sos-wide) #sos-unavailable-text { font-size: 0.78rem; line-height: 1.35; }
-  .layout:not(.sos-wide) .call-112 { min-height: 48px; margin-top: auto; padding: 0 0.25rem; font-size: 0.9rem; }
+  .topbar .brand span { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+  .topbar .brand-mark { width: 36px; height: 36px; border-radius: 10px; }
+  .topbar .header-about { display: inline; }
+  .topbar .pill-link[data-initials] { width: auto; padding: 0 14px; font-size: 0.85rem; }
+  .topbar .pill-link[data-initials]::after { content: none; }
+  .topbar .status-pill {
+    position: absolute;
+    top: 16px;
+    left: calc(100% + 16px);
+    width: max-content;
+    max-width: calc(100vw - var(--panel-w) - 260px);
+  }
+  .tracker-body .notice-bar { top: 76px; left: calc(var(--panel-w) + 16px); right: 220px; }
+
+  .tracker-body .sheet {
+    top: 72px;
+    right: auto;
+    width: var(--panel-w);
+    height: auto;
+    border-top: 0;
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    box-shadow: none;
+    transform: none !important;
+  }
+  .sheet-grab { display: none; }
+  .sheet-status { padding-top: 20px; }
+
+  .sos-card { right: 20px; bottom: 36px; }
+  .sos-card.is-open, .checkin-overlay { place-items: center; }
 }
 
-@media (max-width: 360px) {
-  .layout { grid-template-columns: minmax(0, 1fr) 6.25rem; }
-  .instrument-state { font-size: 1.35rem; }
+/* ---------- Phase 8 refinements ---------- */
+/* An SOS in progress, at the top of the sheet. */
+.sos-sheet-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--danger);
+  border-radius: 14px;
+  background: rgb(220 38 38 / 0.14);
+  color: #ffb4b4;
+  font-size: 0.9rem;
+  font-weight: 650;
 }
+.sos-sheet-banner p { flex: 1 1 auto; min-width: 0; margin: 0; }
+.sos-sheet-banner .button { min-height: 40px; padding: 0 14px; }
+.sos-sheet-dot { position: relative; flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; background: var(--danger); }
+.sos-sheet-dot::after { content: ""; position: absolute; inset: -4px; border: 2px solid var(--danger); border-radius: 50%; animation: breathe 1.6s var(--ease-out) infinite; }
+
+/* Active SOS panel: the status line is the heading; the section label stays for screen readers only. */
+.sos-card.is-open[data-view="active"] .sos-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sos-card.is-open[data-view="active"] #sos-active .sos-count { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.015em; }
+.sos-active-actions .button { flex: 1 1 0; min-height: 50px; }
+.sos-active-actions #sos-hide { flex: 0 1 8rem; }
+
+/* Check-in options: a real disclosure with a chevron and a summary of what will happen. */
+.trip-more summary { list-style: none; flex-wrap: wrap; gap: 2px 8px; padding: 6px 0; }
+.trip-more summary::-webkit-details-marker { display: none; }
+.trip-more summary::after {
+  content: "";
+  width: 8px; height: 8px;
+  margin-left: auto;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 200ms var(--ease-out);
+}
+.trip-more[open] summary::after { transform: rotate(-135deg) translateY(-2px); }
+.trip-more-sum { flex: 1 1 100%; order: 3; color: var(--text-muted); font-size: 0.82rem; font-weight: 500; }
+.trip-more + .trip-note { margin-top: 0.5rem; }
+
+/* History heading on one line; Fit route as a compact icon button (its label is its accessible name). */
+.history-card .card-heading { align-items: flex-start; }
+.history-card .card-heading h2 { white-space: nowrap; }
+.history-tools { flex-wrap: nowrap; }
+.history-tools .icon-button { width: 40px; min-height: 38px; padding: 0; }
+.history-tools .icon-button .button-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#fit-button:disabled { display: none; } /* nothing to fit yet */
+
+/* The current route glows like the prototype's; earlier trips stay quiet. */
+.route-current { filter: drop-shadow(0 0 6px rgb(139 92 246 / 0.65)); }
+/* "You are here" pings softly. */
+.marker-latest span { position: relative; }
+.marker-latest span::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  animation: ping 2.4s var(--ease-out) infinite;
+}
+.marker-latest.is-flagged span::after { border-color: var(--warning); }
+@keyframes ping { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(3); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .button, .switch-track, .switch-track::after { transition: none; }
-  .instrument, .condition, .condition-dot { transition: none; }
-  .instrument[data-tone="calm"] .condition-dot::after { animation: none; opacity: 0; }
-  .auth-body::before { animation: none; }
-  /* The spinner stops; the "Loading map..." text still shows the state. */
-  .spinner { animation: none; border-top-color: var(--border-strong); }
+  .tracker-body .sheet, .sos-card, .status-pill, .condition-dot, .map-area .leaflet-bottom { transition: none; }
+  .status-pill[data-tone="calm"] .condition-dot::after, .sos-fab.is-active::after { animation: none; opacity: 0; }
+  .sos-card.is-open, .sos-card.is-open .sos-panel, .checkin-overlay, .checkin-card { animation: none; }
+  .sos-sheet-dot::after, .marker-latest span::after { animation: none; opacity: 0; }
+  .trip-more summary::after { transition: none; }
 }

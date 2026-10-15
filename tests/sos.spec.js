@@ -94,6 +94,35 @@ test.describe("SOS", () => {
     expect(await events(page)).toHaveLength(0);
   });
 
+  test("an active SOS can be hidden to look at the map, keeps a button on the map, and opens again", async ({ page }) => {
+    await readyForSos(page);
+    await sendSosNow(page);
+
+    await page.getByRole("button", { name: "Hide" }).click();
+    await expect(page.locator("#sos-active")).toBeHidden();
+    const show = page.getByRole("button", { name: "SOS active: show details" });
+    await expect(show).toBeVisible();
+    await expect(page.getByRole("button", { name: "Send SOS" })).toBeHidden(); // still active: no second SOS
+    await expect(page.locator(".call-112")).toBeVisible();
+
+    await show.click();
+    await expect(page.getByRole("button", { name: "I'm safe: cancel SOS" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(show).toBeVisible();
+    expect((await events(page))[0].status).toBe("active"); // hiding it never cancels it
+  });
+
+  test("without trusted contacts, the map's SOS button explains what's needed and keeps Call 112 in reach", async ({ page }) => {
+    await createVerifiedUser(page, { name: "Ada" });
+    await openApp(page);
+    await page.getByRole("button", { name: "Emergency: SOS and Call 112" }).click();
+    await expect(page.locator("#sos-unavailable-text")).toBeVisible();
+    await expect(page.locator("#sos-unavailable-text")).toContainText("Add at least one trusted contact");
+    await expect(page.locator(".call-112")).toBeVisible();
+    await page.getByRole("button", { name: "Close" }).click();
+    await expect(page.locator("#sos-unavailable-text")).toBeHidden();
+  });
+
   test("successful alert: fresh location sent, simulated delivery confirmed, shown honestly", async ({ page }) => {
     await readyForSos(page);
     await sendSosNow(page);

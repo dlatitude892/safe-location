@@ -1,5 +1,5 @@
 // Trip Mode (Phase 7) in the browser.
-// TEST MODE: simulated GPS and notifications; a trip-setting "minute" lasts 200 ms on the test server
+// TEST MODE: simulated GPS and notifications; a trip-setting "minute" lasts 400 ms on the test server
 // (TRIP_TEST_MINUTE_MS) and the watchdog runs every 200 ms, so missed check-ins happen within seconds.
 // The page has a fake clock: page.clock.fastForward() moves the phone's timers (recording, polling).
 const {
@@ -21,7 +21,7 @@ async function readyForTrips(page, contacts = [{ name: "Mum", phone: "+234803123
   await expect(page.getByRole("button", { name: "Start a trip" })).toBeVisible();
 }
 
-// Fills the Trip Mode form. silence/grace are in trip "minutes" (200 ms each on the test server).
+// Fills the Trip Mode form. silence/grace are in trip "minutes" (400 ms each on the test server).
 async function startTripWithForm(page, { silence = "60", grace = "15", escalation = "checkin-then-notify", notifyStartEnd = false, arrivalInMinutes = null } = {}) {
   await page.getByRole("button", { name: "Start a trip" }).click();
   await expect(page.getByRole("button", { name: "Start trip" })).toBeEnabled(); // contacts loaded
@@ -34,6 +34,9 @@ async function startTripWithForm(page, { silence = "60", grace = "15", escalatio
     }, arrivalInMinutes);
     await page.getByLabel("Expected arrival (optional)").fill(time);
   }
+  // The check-in rules are folded under "Check-in options" (sensible defaults for most trips).
+  const more = page.locator("details.trip-more");
+  if (!(await more.evaluate((node) => node.open))) await more.locator("summary").click();
   await page.locator("#trip-silence").selectOption(silence);
   await page.locator("#trip-grace").selectOption(grace);
   await page.locator(`input[name="trip-escalation"][value="${escalation}"]`).check();
@@ -114,6 +117,17 @@ test.describe("Trip Mode", () => {
     expect(sessions).toEqual([id]);
   });
 
+  test("starting a trip while already tracking keeps recording, now as part of the trip", async ({ page }) => {
+    await readyForTrips(page);
+    await page.getByRole("button", { name: "Start Tracking" }).click();
+    await expect(entries(page)).toHaveCount(1);
+
+    const id = await startTripWithForm(page);
+    await expect(page.locator("#tracking-state")).toHaveText("Tracking active");
+    expect(await page.evaluate(() => tracker.sessionId)).toBe(id); // new points belong to the trip
+    await expect(page.locator("#message")).not.toContainText("another Safe Location tab");
+  });
+
   test("updates stop: the server asks for a check-in, and 'I'm OK' clears it", async ({ page, context }) => {
     await readyForTrips(page);
     const id = await startTripWithForm(page, { silence: "10", escalation: "remind-only" });
@@ -122,7 +136,8 @@ test.describe("Trip Mode", () => {
 
     await page.clock.fastForward(30000); // the phone's next status check
     await expect(badge(page)).toHaveText("Check-in requested");
-    await expect(page.locator("#trip-checkin-text")).toContainText("No location has reached the server for a while. Are you OK? Your contacts won't be told.");
+    await expect(page.locator("#trip-checkin-text")).toHaveText("No location has reached the server for 10 minutes. Your contacts won't be told.");
+    await expect(page.getByRole("button", { name: "I'm OK" })).toBeFocused(); // shown over the map, with the focus
     await expect(page).toHaveTitle("Check in · Safe Location");
 
     await page.getByRole("button", { name: "I'm OK" }).click();
@@ -183,6 +198,7 @@ test.describe("Trip Mode", () => {
     await page.getByRole("button", { name: "Start a trip" }).click();
     await page.getByLabel("From").fill("Ikeja");
     await page.getByLabel("To", { exact: true }).fill("Surulere");
+    await page.locator("details.trip-more summary").click(); // "Check-in options"
     await page.locator("#trip-silence").selectOption("60");
     await page.getByRole("button", { name: "Start trip" }).click();
     await expect(badge(page)).toHaveText("Offline (not yet registered)");

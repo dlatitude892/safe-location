@@ -94,7 +94,7 @@ const elements = {
   trackingState: document.querySelector("#tracking-state"),
   networkPill: document.querySelector("#network-pill"),
   networkState: document.querySelector("#network-state"),
-  layout: document.querySelector(".layout"),
+  shell: document.querySelector(".app-shell"),
   instrument: document.querySelector("#instrument"),
   conditionText: document.querySelector("#condition-text"),
   extraLabel: document.querySelector("#extra-readout-label"),
@@ -225,7 +225,7 @@ function setMessage(text, type = "") {
 }
 
 function loadSettings() {
-  const defaults = { intervalMs: DEFAULT_INTERVAL_MS, follow: true, mapStyle: "street" };
+  const defaults = { intervalMs: DEFAULT_INTERVAL_MS, follow: true, mapStyle: "dark" }; // the dark map matches the app at night
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
     return {
@@ -612,25 +612,32 @@ const tracker = {
   nextDueAt: 0,
   lastSavedFixTimestamp: null,
   resumed: false, // true until the first reading after an automatic resume
-  releaseLock: null
+  releaseLock: null,
+  lockReleased: null
 };
 
 // Prevents two tabs tracking at once. Uses the Web Locks API when available.
+// Resolves to { release, released } (released settles once the lock is really free again), or null when
+// another tab holds the lock.
 function acquireTrackingLock() {
-  if (!navigator.locks) return Promise.resolve(() => {}); // older browsers: no cross-tab protection
+  if (!navigator.locks) return Promise.resolve({ release: () => {}, released: Promise.resolve() }); // older browsers: no cross-tab protection
   return new Promise((resolve, reject) => {
-    navigator.locks
+    const released = navigator.locks
       .request(TRACKING_LOCK_NAME, { ifAvailable: true }, (lock) => {
         if (!lock) {
           resolve(null);
           return undefined;
         }
         // Hold the lock until the returned promise resolves (when tracking stops or the tab closes).
-        return new Promise((release) => resolve(release));
+        return new Promise((release) => resolve({ release, released }));
       })
       .catch(reject);
   });
 }
+
+// A lock released by Stop is freed a moment later. Starting again straight away (for example when a trip
+// starts while tracking) waits for that, instead of mistaking it for another tab.
+let trackingLockReleasing = null;
 
 // sessionId: record under this ID (Trip Mode uses the trip's ID). resumeSessionId: continue after a refresh.
 async function startTracking({ resumeSessionId = null, sessionId = null } = {}) {
@@ -649,25 +656,33 @@ async function startTracking({ resumeSessionId = null, sessionId = null } = {}) 
   renderTrackingState();
   requestPersistentStorage();
 
-  let release;
+  if (trackingLockReleasing) {
+    await trackingLockReleasing;
+    trackingLockReleasing = null;
+  }
+  let lock;
   try {
-    release = await acquireTrackingLock();
+    lock = await acquireTrackingLock();
   } catch {
-    release = () => {};
+    lock = { release: () => {}, released: Promise.resolve() };
   }
   if (tracker.status !== "starting") {
     // Stop was pressed while we were waiting for the lock.
-    if (release) release();
+    if (lock) {
+      lock.release();
+      trackingLockReleasing = lock.released;
+    }
     return;
   }
-  if (!release) {
+  if (!lock) {
     tracker.status = "idle";
     renderTrackingState();
     setMessage("Tracking is already running in another Safe Location tab or window. Stop it there first.", "error");
     return;
   }
 
-  tracker.releaseLock = release;
+  tracker.releaseLock = lock.release;
+  tracker.lockReleased = lock.released;
   tracker.runId += 1;
   const runId = tracker.runId;
   tracker.status = "active";
@@ -701,7 +716,10 @@ function stopTracking(message = "Tracking stopped. Your saved history is still o
   if (tracker.watchId !== null) navigator.geolocation.clearWatch(tracker.watchId);
   clearTimeout(tracker.timerId);
   clearInterval(tracker.uiTimerId);
-  if (tracker.releaseLock) tracker.releaseLock();
+  if (tracker.releaseLock) {
+    tracker.releaseLock();
+    trackingLockReleasing = tracker.lockReleased;
+  }
 
   Object.assign(tracker, {
     status: "idle",
@@ -712,7 +730,8 @@ function stopTracking(message = "Tracking stopped. Your saved history is still o
     tickRunning: false,
     requestInFlight: false,
     latestFix: null,
-    releaseLock: null
+    releaseLock: null,
+    lockReleased: null
   });
   clearActiveSession();
 
@@ -1030,7 +1049,8 @@ function drawMap(trips) {
       if (line.length < 2) return;
       L.polyline(line.map(toLatLng), {
         color: cssColor(isCurrent ? "--accent" : "--old-route"),
-        weight: isCurrent ? 5 : 3,
+        weight: isCurrent ? 6 : 3,
+        className: isCurrent ? "route-current" : "route-earlier",
         opacity: isCurrent ? 0.95 : 0.6,
         lineJoin: "round",
         interactive: false
@@ -1092,10 +1112,24 @@ function describeGap(gap) {
 
 function toLatLng(record) { return [record.latitude, record.longitude]; }
 
+// On phones the top bar and the sheet cover the top and bottom of the map: centre things in the part
+// that can be seen. (On computers the sheet is a panel beside the map, so nothing is covered.)
+function mapInsets() {
+  const desktop = sheetUi.desktop.matches;
+  return { top: desktop ? 0 : 64, bottom: desktop ? 0 : sheetUi.visible };
+}
+
+function setVisibleView(latlng, zoom) {
+  const map = mapView.map;
+  const { top, bottom } = mapInsets();
+  const shifted = map.project(latlng, zoom).add([0, (bottom - top) / 2]);
+  map.setView(map.unproject(shifted, zoom), zoom);
+}
+
 function recenterOnLatest() {
   const latest = app.history[app.history.length - 1];
   if (!mapView.map || !latest) return;
-  mapView.map.setView(toLatLng(latest), Math.max(mapView.map.getZoom(), 16));
+  setVisibleView(toLatLng(latest), Math.max(mapView.map.getZoom(), 16));
 }
 
 function fitRoute() {
@@ -1103,9 +1137,10 @@ function fitRoute() {
   const reliable = app.history.filter(isReliable);
   const points = (reliable.length ? reliable : app.history).map(toLatLng);
   if (points.length === 1) {
-    mapView.map.setView(points[0], 16);
+    setVisibleView(points[0], 16);
   } else {
-    mapView.map.fitBounds(L.latLngBounds(points), { padding: [40, 40], maxZoom: 17 });
+    const { top, bottom } = mapInsets();
+    mapView.map.fitBounds(L.latLngBounds(points), { paddingTopLeft: [40, 40 + top], paddingBottomRight: [40, 40 + bottom], maxZoom: 17 });
   }
 }
 
@@ -1123,7 +1158,8 @@ function setFollow(enabled) {
 function focusRecord(record) {
   if (!mapView.map) return;
   setFollow(false);
-  mapView.map.setView(toLatLng(record), Math.max(mapView.map.getZoom(), 16));
+  setSheet("peek"); // phones: show the map again (computers: no change)
+  setVisibleView(toLatLng(record), Math.max(mapView.map.getZoom(), 16));
   L.popup()
     .setLatLng(toLatLng(record))
     .setContent(`${formatDateTime(record.timestamp)}<br>Accuracy ${formatAccuracy(record.accuracy)}${isReliable(record) ? "" : "<br><em>Flagged point</em>"}`)
@@ -1393,27 +1429,38 @@ function renderCondition() {
   const serverDown = !offline && API_BASE_URL !== null && app.server === "unavailable";
   const to = open ? ` to ${trip.current.destination}` : "";
 
+  // [tone, short line for the pill, full sentence for screen readers]
   let tone = "idle";
+  let short = "Not recording";
   let text = "Not recording: nothing is being saved or shared";
-  if (sosState.view === "active") [tone, text] = ["alert", "SOS active: your trusted contacts are being alerted"];
-  else if (sosState.view === "queued") [tone, text] = ["alert", "SOS waiting to be sent: it goes out when the connection returns"];
-  else if (sosState.view === "countdown" || sosState.view === "sending") [tone, text] = ["alert", "Sending SOS…"];
-  else if (tripState === "checkin-requested") [tone, text] = ["alert", "Check-in requested: tap \"I'm OK\" in Trip Mode"];
-  else if (!app.storageReady || app.unsavedIds.size) [tone, text] = ["attention", "New points can't be saved on this device"];
-  else if (app.locationPermission === "denied" && (tracking || open)) [tone, text] = ["attention", "Location permission denied: nothing is being recorded"];
-  else if (tripState === "paused") [tone, text] = ["attention", `Trip${to} paused: not recording`];
-  else if (tracker.status === "starting") [tone, text] = ["calm", "Starting…"];
+  const waiting = (n) => `${n.toLocaleString()} point${n === 1 ? "" : "s"}`;
+  if (sosState.view === "active") [tone, short, text] = ["alert", "SOS active", "SOS active: your trusted contacts are being alerted"];
+  else if (sosState.view === "queued") [tone, short, text] = ["alert", "SOS waiting to send", "SOS waiting to be sent: it goes out when the connection returns"];
+  else if (sosState.view === "countdown" || sosState.view === "sending") [tone, short, text] = ["alert", "Sending SOS…", "Sending SOS…"];
+  else if (tripState === "checkin-requested") [tone, short, text] = ["alert", "Check-in requested", "Check-in requested: tap \"I'm OK\" to answer"];
+  else if (!app.storageReady || app.unsavedIds.size) [tone, short, text] = ["attention", "Can't save on this device", "New points can't be saved on this device"];
+  else if (app.locationPermission === "denied" && (tracking || open)) [tone, short, text] = ["attention", "Location permission off", "Location permission denied: nothing is being recorded"];
+  else if (tripState === "paused") [tone, short, text] = ["attention", "Trip paused", `Trip${to} paused: not recording`];
+  else if (tracker.status === "starting") [tone, short, text] = ["calm", "Starting…", "Starting…"];
   else if (tracking) {
     const what = open ? `Trip${to}: recording` : "Recording";
-    if (offline || serverDown) [tone, text] = ["attention", `${what} offline: points wait on this phone`];
-    else if (tracker.lastLiveError || (fix && fixAge > NO_RECENT_FIX_MS)) [tone, text] = ["attention", `${what}, but GPS has no recent fix`];
-    else if (tripState === "delayed") [tone, text] = ["attention", `${what}: updates are reaching the server late`];
-    else if (pending && sync.lastError) [tone, text] = ["attention", `${what}: ${pending.toLocaleString()} point${pending === 1 ? "" : "s"} waiting to upload`];
-    else [tone, text] = ["calm", `${what} every ${formatInterval(app.settings.intervalMs)}`];
-  } else if (pending) [tone, text] = ["attention", `Not recording: ${pending.toLocaleString()} point${pending === 1 ? "" : "s"} waiting to upload`];
+    if (offline || serverDown) [tone, short, text] = ["attention", "Offline · points wait here", `${what} offline: points wait on this phone`];
+    else if (tracker.lastLiveError || (fix && fixAge > NO_RECENT_FIX_MS)) [tone, short, text] = ["attention", "No recent GPS fix", `${what}, but GPS has no recent fix`];
+    else if (tripState === "delayed") [tone, short, text] = ["attention", "Updates delayed", `${what}: updates are reaching the server late`];
+    else if (pending && sync.lastError) [tone, short, text] = ["attention", `${waiting(pending)} to upload`, `${what}: ${waiting(pending)} waiting to upload`];
+    else [tone, short, text] = ["calm", open ? `Trip${to}` : `Recording · every ${formatInterval(app.settings.intervalMs)}`, `${what} every ${formatInterval(app.settings.intervalMs)}`];
+  } else if (pending) [tone, short, text] = ["attention", `${waiting(pending)} to upload`, `Not recording: ${waiting(pending)} waiting to upload`];
 
   if (panel.dataset.tone !== tone) panel.dataset.tone = tone;
-  if (elements.conditionText.textContent !== text) elements.conditionText.textContent = text; // no repeat announcements
+  // The pill shows the short line; screen readers hear the full sentence (and only when it changes).
+  if (elements.conditionText.dataset.text !== text || elements.conditionText.dataset.short !== short) {
+    elements.conditionText.dataset.text = text;
+    elements.conditionText.dataset.short = short;
+    elements.conditionText.replaceChildren(
+      (() => { const line = document.createElement("span"); line.textContent = short; line.setAttribute("aria-hidden", "true"); return line; })(),
+      Object.assign(document.createElement("span"), { textContent: text, className: "visually-hidden" })
+    );
+  }
 
   // Fourth readout: the trip while one is open, otherwise what is saved here.
   if (open) {
@@ -1982,11 +2029,14 @@ function renderSyncStatus() {
     link.textContent = account.user.name.length > 18 ? `${account.user.name.slice(0, 17)}…` : account.user.name;
     link.href = "/account";
     link.setAttribute("aria-label", `Your account (${account.user.name})`);
+    // Phones show initials in a round button; the full name stays the link's accessible name.
+    link.dataset.initials = account.user.name.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0].toUpperCase()).join("");
   } else {
     link.hidden = false;
     link.textContent = "Sign in";
     link.href = "/signin";
     link.removeAttribute("aria-label");
+    delete link.dataset.initials;
   }
 
   if (!sync.enabled) {
@@ -2103,7 +2153,10 @@ const sosState = {
   pollTimer: null,
   retryTimer: null,
   retryAttempt: 0,
-  message: ""
+  message: "",
+  collapsed: false, // an active SOS hidden to look at the map
+  infoOpen: false, // the SOS panel opened from the map button (no contacts yet)
+  messageTimer: null
 };
 
 const sosEl = {
@@ -2132,7 +2185,13 @@ const sosEl = {
   activeLink: document.querySelector("#sos-active-link"),
   cancelButton: document.querySelector("#sos-cancel"),
   cancelDialog: document.querySelector("#sos-cancel-dialog"),
-  message: document.querySelector("#sos-message")
+  message: document.querySelector("#sos-message"),
+  fab: document.querySelector("#sos-fab"),
+  close: document.querySelector("#sos-close"),
+  hide: document.querySelector("#sos-hide"),
+  banner: document.querySelector("#sos-sheet-banner"),
+  bannerText: document.querySelector("#sos-sheet-text"),
+  bannerShow: document.querySelector("#sos-sheet-show")
 };
 
 async function sosRequest(path, { method = "GET", body } = {}) {
@@ -2143,6 +2202,10 @@ async function sosRequest(path, { method = "GET", body } = {}) {
 }
 
 function setSosView(view, message = sosState.message) {
+  if (view !== sosState.view) {
+    sosState.collapsed = false; // a new state (for example an SOS that just became active) is shown open
+    sosState.infoOpen = false;
+  }
   sosState.view = view;
   sosState.message = message;
   renderSos();
@@ -2169,9 +2232,32 @@ function describeSosLocation(location) {
 function renderSos() {
   if (!sosEl.card) return;
   Object.entries(sosEl.panels).forEach(([name, panel]) => { panel.hidden = name !== sosState.view; });
-  // On phones the SOS card is a narrow column beside the status panel; anything but the ready
-  // button needs the full width.
-  elements.layout.classList.toggle("sos-wide", sosState.view !== "ready");
+  // On the map: the red SOS button (ready), or a button that opens the SOS panel (no contacts yet, or an
+  // active SOS that was hidden). Countdown, sending and waiting are always shown open, over the map.
+  const view = sosState.view;
+  const open = ["countdown", "sending", "queued"].includes(view) || (view === "active" && !sosState.collapsed) || (view === "unavailable" && sosState.infoOpen === true);
+  sosEl.card.classList.toggle("is-open", Boolean(open));
+  sosEl.card.dataset.view = view;
+  sosEl.card.style.setProperty("--sos-left", String(view === "countdown" ? sosState.secondsLeft / SOS_COUNTDOWN_SECONDS : 1));
+  sosEl.fab.hidden = open || view === "ready";
+  sosEl.fab.classList.toggle("is-active", view === "active");
+  sosEl.fab.setAttribute("aria-label", view === "active" ? "SOS active: show details" : "Emergency: SOS and Call 112");
+  sosEl.close.hidden = view !== "unavailable"; // an active SOS has its own Hide button next to "I'm safe"
+  // The sheet says so too while an SOS is in progress, with a way back to its details.
+  const live = ["active", "queued", "countdown", "sending"].includes(view);
+  sosEl.banner.hidden = !live;
+  if (live) {
+    const firstAlert = view === "active" && sosState.event ? sosState.event.notifications.find((item) => item.kind === "alert") : null;
+    sosEl.bannerText.textContent = view === "active"
+      ? `SOS active since ${formatTime(sosState.event.createdAt)}${firstAlert ? ` · ${firstAlert.contactName}: ${describeSosNotification(firstAlert)}` : ""}`
+      : view === "queued" ? "SOS waiting to be sent" : "Sending SOS…";
+    sosEl.bannerShow.hidden = view !== "active" || !sosState.collapsed;
+  }
+  // A note next to the closed SOS button (for example "SOS not sent.") fades after a while.
+  clearTimeout(sosState.messageTimer);
+  if (!open && sosState.message && ["ready", "unavailable"].includes(view)) {
+    sosState.messageTimer = setTimeout(() => { sosState.message = ""; renderSos(); }, 12000);
+  }
   renderCondition();
   sosEl.message.textContent = sosState.message;
   sosEl.message.hidden = !sosState.message;
@@ -2472,8 +2558,29 @@ function bindSosEvents() {
   sosEl.abort.addEventListener("click", abortSosCountdown);
   sosEl.queuedCancel.addEventListener("click", cancelQueuedSos);
   sosEl.cancelButton.addEventListener("click", openSosCancelDialog);
+  document.querySelector("#sheet-sos").addEventListener("click", () => {
+    if (sosState.view === "ready") startSosCountdown();
+    else sosEl.fab.click();
+  });
+  sosEl.fab.addEventListener("click", () => {
+    if (sosState.view === "active") sosState.collapsed = false;
+    else sosState.infoOpen = true;
+    renderSos();
+    (sosState.view === "active" ? sosEl.hide : sosEl.close).focus();
+  });
+  const closeSosPanel = () => {
+    if (sosState.view === "active") sosState.collapsed = true;
+    else sosState.infoOpen = false;
+    renderSos();
+    sosEl.fab.focus();
+  };
+  sosEl.close.addEventListener("click", closeSosPanel);
+  sosEl.hide.addEventListener("click", closeSosPanel);
+  sosEl.bannerShow.addEventListener("click", () => sosEl.fab.click());
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && sosState.view === "countdown") abortSosCountdown();
+    if (event.key !== "Escape") return;
+    if (sosState.view === "countdown") abortSosCountdown();
+    else if (sosEl.card.classList.contains("is-open") && ["active", "unavailable"].includes(sosState.view) && !document.querySelector("dialog[open]")) closeSosPanel();
   });
   window.addEventListener("online", () => {
     if (readPendingSos()) {
@@ -2735,14 +2842,24 @@ function expectedArrivalFromInput(value) {
   return target.getTime();
 }
 
+// "Check-in options" stays folded, but says what will happen with the current choices.
+function describeTripOptions() {
+  const silence = tripEl.silence.value;
+  const grace = tripEl.grace.value;
+  const rule = tripEl.form.querySelector('input[name="trip-escalation"]:checked').value;
+  const what = rule === "remind-only" ? "only remind me" : rule === "notify-immediately" ? "tell contacts straight away" : `tell contacts if no answer in ${grace} min`;
+  document.querySelector("#trip-more-sum").textContent = `Ask after ${silence === "60" ? "1 hour" : `${silence} min`} · ${what}`;
+}
+
 async function openTripForm() {
+  describeTripOptions();
   tripEl.formError.textContent = "";
   tripEl.interval.value = String(app.settings.intervalMs);
   const submit = tripEl.form.querySelector('button[type="submit"]');
   submit.disabled = true; // until the contact list has loaded, so a quick tap can't start a trip without them
   tripEl.contactsHelp.textContent = "Loading your contacts…";
   showTripPanel("form");
-  tripEl.origin.focus();
+  tripEl.origin.focus({ preventScroll: true }); // revealInSheet scrolls the form into view
   await loadTripContacts();
   submit.disabled = false;
 }
@@ -2785,8 +2902,9 @@ async function submitTripForm(event) {
   setMessage(navigator.onLine ? "Trip started." : "Trip started offline: it will be registered with the server when you're back online.", "success");
   scheduleTripPoll();
   renderAll();
-  // The form is below the map on phones: bring the live status panel back into view.
-  elements.instrument.scrollIntoView({ block: "start" });
+  // Show the trip's status: phones lower the sheet; computers scroll the panel back to the top.
+  setSheet("peek");
+  sheetUi.body.scrollTop = 0;
 }
 
 async function togglePause() {
@@ -2828,6 +2946,7 @@ function checkIn() {
 
 function showTripPanel(name) {
   ["unavailable", "idle", "form", "active"].forEach((key) => { tripEl[key].hidden = key !== name; });
+  if (name === "form") revealInSheet(tripEl.card);
   tripEl.open.hidden = name !== "idle"; // "Start a trip" lives in the status panel
 }
 
@@ -2864,11 +2983,13 @@ function renderTrip() {
         : "Register this browser in the Backup and sync card first, so the trip's locations can reach the server.";
     showTripPanel("unavailable");
     tripEl.trackingNote.hidden = true;
+    tripEl.checkin.hidden = true;
     return;
   }
   if (!trip.current) {
     if (tripEl.form.hidden) showTripPanel("idle");
     tripEl.trackingNote.hidden = true;
+    tripEl.checkin.hidden = true;
     document.title = "Safe Location";
     return;
   }
@@ -2898,9 +3019,13 @@ function renderTrip() {
   tripEl.stateText.textContent = explanations[state] + unregistered;
 
   // Check-in request: what the server noticed, and exactly what happens next.
+  const checkinWasHidden = tripEl.checkin.hidden;
   tripEl.checkin.hidden = state !== "checkin-requested";
+  if (checkinWasHidden && !tripEl.checkin.hidden) tripEl.checkinOk.focus(); // the question gets the focus
   if (state === "checkin-requested") {
-    const reason = current.checkinReason === "overdue" ? "Your expected arrival time has passed." : "No location has reached the server for a while.";
+    const reason = current.checkinReason === "overdue"
+      ? "Your expected arrival time has passed."
+      : `No location has reached the server for ${silence} minute${silence === 1 ? "" : "s"}.`;
     const names = (current.contacts || []).map((contact) => contact.name).join(", ");
     let next;
     if (current.contactsAlertedAt) next = `Your contacts${names ? ` (${names})` : ""} have been told. Tap "I'm OK" to let them know you're fine.`;
@@ -2910,7 +3035,7 @@ function renderTrip() {
       const at = current.msUntilContactsAlerted !== null && current.msUntilContactsAlerted !== undefined ? trip.fetchedAt + current.msUntilContactsAlerted : null;
       next = at ? `If you don't answer by ${formatTime(at)}, ${names} will be told.` : `If you don't answer soon, ${names} will be told.`;
     }
-    tripEl.checkinText.textContent = `${reason} Are you OK? ${next}`;
+    tripEl.checkinText.textContent = `${reason} ${next}`; // the heading already asks "Are you OK?"
     document.title = "Check in · Safe Location";
   } else {
     document.title = "Safe Location";
@@ -2967,6 +3092,7 @@ function bindTripEvents() {
   tripEl.open.addEventListener("click", openTripForm);
   tripEl.formCancel.addEventListener("click", () => showTripPanel("idle"));
   tripEl.form.addEventListener("submit", submitTripForm);
+  tripEl.form.addEventListener("change", describeTripOptions);
   tripEl.pause.addEventListener("click", togglePause);
   tripEl.end.addEventListener("click", () => endTrip("completed"));
   tripEl.cancel.addEventListener("click", () => endTrip("cancelled"));
@@ -3001,6 +3127,129 @@ async function initTrip() {
 }
 
 /* ===================================================================
+   11b. The sheet (Phase 8): swipe-up on phones, a panel on computers
+   =================================================================== */
+// Phones: the sheet has three heights. "peek" shows the status and the main buttons, "half" adds the
+// readings, "full" shows everything. Computers (960px and wider): it's a fixed panel on the left.
+const sheetUi = {
+  el: document.querySelector("#sheet"),
+  body: document.querySelector("#sheet-body"),
+  grab: document.querySelector("#sheet-grab"),
+  peekEnd: document.querySelector("#peek-end"),
+  pillButton: document.querySelector("#pill-hit"),
+  state: "peek",
+  visible: 0, // pixels of the map covered by the sheet (phones)
+  desktop: window.matchMedia("(min-width: 960px)")
+};
+const SHEET_STATES = ["peek", "half", "full"];
+
+function sheetHeights() {
+  const height = sheetUi.el.offsetHeight;
+  const peek = Math.min(height, sheetUi.grab.offsetHeight + sheetUi.peekEnd.offsetTop + 12);
+  const half = Math.min(height, Math.max(peek + 120, Math.round(elements.shell.clientHeight * 0.56)));
+  return { height, visible: { peek, half, full: height } };
+}
+
+function setSheet(state, { resetScroll = true } = {}) {
+  if (!sheetUi.el) return;
+  if (sheetUi.desktop.matches) {
+    sheetUi.state = "full";
+    sheetUi.visible = 0;
+    sheetUi.el.style.removeProperty("--sheet-y");
+  } else {
+    sheetUi.state = state;
+    const { height, visible } = sheetHeights();
+    sheetUi.visible = visible[state];
+    sheetUi.el.style.setProperty("--sheet-y", `${height - visible[state]}px`);
+    if (state === "peek" && resetScroll) sheetUi.body.scrollTop = 0;
+  }
+  elements.shell.style.setProperty("--sheet-visible", `${sheetUi.visible}px`);
+  // SOS and Call 112 ride on top of the sheet, but never higher than its middle height.
+  const dock = sheetUi.desktop.matches ? 0 : Math.min(sheetUi.visible, sheetHeights().visible.half);
+  elements.shell.style.setProperty("--dock-bottom", `${dock}px`);
+  if (sheetUi.desktop.matches) delete elements.shell.dataset.sheet;
+  else elements.shell.dataset.sheet = sheetUi.state;
+  const expanded = sheetUi.desktop.matches || sheetUi.state !== "peek";
+  sheetUi.grab.setAttribute("aria-expanded", String(expanded));
+  sheetUi.grab.setAttribute("aria-label", sheetUi.state === "full" ? "Show less" : "Show more");
+  sheetUi.pillButton.setAttribute("aria-expanded", String(expanded));
+}
+
+// Keeps the peek height right when the buttons above it change (Start becomes Stop and Start a trip...).
+function refreshSheet() {
+  if (sheetUi.desktop.matches || sheetUi.state === "peek") setSheet(sheetUi.state, { resetScroll: false });
+}
+
+// Opens the sheet (phones) and scrolls a section to the top of it.
+function revealInSheet(section) {
+  if (!sheetUi.el) return;
+  if (!sheetUi.desktop.matches) setSheet("full", { resetScroll: false });
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  requestAnimationFrame(() => sheetUi.body.scrollTo({ top: Math.max(0, section.offsetTop - 8), behavior: reduce ? "auto" : "smooth" }));
+}
+
+function bindSheet() {
+  if (!sheetUi.el) return;
+  const grab = sheetUi.grab;
+  let drag = null;
+  let ignoreClick = false;
+
+  // Drag the handle to any height; on release it settles on the nearest of the three.
+  grab.addEventListener("pointerdown", (event) => {
+    if (sheetUi.desktop.matches) return;
+    const { height, visible } = sheetHeights();
+    drag = { startY: event.clientY, startShown: visible[sheetUi.state], height, visible, moved: false };
+    grab.setPointerCapture(event.pointerId);
+    sheetUi.el.classList.add("is-dragging");
+  });
+  grab.addEventListener("pointermove", (event) => {
+    if (!drag) return;
+    const dy = event.clientY - drag.startY;
+    if (Math.abs(dy) > 5) drag.moved = true;
+    const shown = Math.min(drag.visible.full, Math.max(drag.visible.peek, drag.startShown - dy));
+    sheetUi.el.style.setProperty("--sheet-y", `${drag.height - shown}px`);
+  });
+  const release = (event) => {
+    if (!drag) return;
+    const current = drag;
+    drag = null;
+    sheetUi.el.classList.remove("is-dragging");
+    if (!current.moved) return; // a tap: the click handler below cycles the heights
+    ignoreClick = true;
+    const shown = current.startShown - (event.clientY - current.startY);
+    const nearest = SHEET_STATES.reduce((best, name) => (Math.abs(current.visible[name] - shown) < Math.abs(current.visible[best] - shown) ? name : best), "peek");
+    setSheet(nearest, { resetScroll: false });
+  };
+  grab.addEventListener("pointerup", release);
+  grab.addEventListener("pointercancel", release);
+  grab.addEventListener("click", () => {
+    if (ignoreClick) { ignoreClick = false; return; }
+    setSheet(sheetUi.state === "peek" ? "half" : sheetUi.state === "half" ? "full" : "peek");
+  });
+
+  // Tapping the status pill shows the details (phones) or scrolls the panel back to the top (computers).
+  sheetUi.pillButton.addEventListener("click", () => {
+    if (sheetUi.desktop.matches) sheetUi.body.scrollTo({ top: 0, behavior: "smooth" });
+    else setSheet(sheetUi.state === "peek" ? "half" : "peek");
+  });
+
+  // Keyboard users tabbing past the visible part of a lowered sheet: open it fully.
+  sheetUi.body.addEventListener("focusin", (event) => {
+    if (sheetUi.desktop.matches || sheetUi.state === "full") return;
+    if (event.target.matches(":focus-visible") && event.target.offsetTop > sheetUi.peekEnd.offsetTop) setSheet("full", { resetScroll: false });
+  });
+
+  if ("ResizeObserver" in window) new ResizeObserver(refreshSheet).observe(document.querySelector(".sheet-status"));
+  window.addEventListener("resize", () => setSheet(sheetUi.state, { resetScroll: false }));
+  sheetUi.desktop.addEventListener("change", () => setSheet(sheetUi.desktop.matches ? "full" : "peek"));
+
+  // First placement without the slide animation.
+  sheetUi.el.classList.add("is-dragging");
+  setSheet("peek");
+  requestAnimationFrame(() => sheetUi.el.classList.remove("is-dragging"));
+}
+
+/* ===================================================================
    12. Start-up
    =================================================================== */
 function bindEvents() {
@@ -3011,9 +3260,10 @@ function bindEvents() {
   bindBackupEvents();
   bindSosEvents();
   bindTripEvents();
+  bindSheet();
   elements.intervalSelect.addEventListener("change", (event) => changeInterval(Number(event.target.value)));
   elements.followToggle.addEventListener("change", (event) => setFollow(event.target.checked));
-  elements.recenter.addEventListener("click", recenterOnLatest);
+  elements.recenter.addEventListener("click", () => setFollow(true)); // centres on you and keeps following
   elements.fit.addEventListener("click", () => {
     setFollow(false);
     fitRoute();

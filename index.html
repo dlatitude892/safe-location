@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="A consent-based personal safety location tracker that stores history in your browser." />
     <meta name="theme-color" content="#0b0a14" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='#7c3aed'/%3E%3Cg fill='none' stroke='#fff' stroke-width='4' stroke-linecap='round'%3E%3Cpath d='M39.1 14.4A19 19 0 0 1 50.8 34.6'/%3E%3Cpath d='M43.7 47A19 19 0 0 1 20.3 47'/%3E%3Cpath d='M13.2 34.6A19 19 0 0 1 24.9 14.4'/%3E%3C/g%3E%3Cg fill='#fff'%3E%3Ccircle cx='32' cy='13' r='4.2'/%3E%3Ccircle cx='48.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='15.5' cy='41.5' r='4.2'/%3E%3Ccircle cx='32' cy='32' r='7.5'/%3E%3C/g%3E%3C/svg%3E" />
@@ -17,174 +17,16 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="tracker-body">
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#sheet-body">Skip to tracker controls</a>
 
-    <header class="app-header">
-      <a class="brand" href="#main" aria-label="Safe Location home">
-        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
-          <rect width="64" height="64" rx="15" fill="#7c3aed" />
-          <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
-        </svg>
-        <span>Safe Location</span>
-      </a>
-      <div class="header-status">
-        <a class="header-about" href="/welcome">How it works</a>
-        <a class="pill pill-link" id="account-link" href="/signin" hidden>Sign in</a>
-      </div>
-    </header>
-
-    <div class="notice-bar" id="storage-notice" hidden></div>
-
-    <main class="layout sos-wide" id="main">
+    <!-- Map first (Phase 8): a full-screen map with the status, map controls and SOS floating over it, and
+         everything else in one sheet (a swipe-up sheet on phones, a panel on the left on computers). -->
+    <main class="app-shell" id="main">
       <h1 class="visually-hidden">Safe Location personal safety tracker</h1>
 
-      <!-- The instrument: one live panel that answers "am I being recorded, and is it reaching anyone?" -->
-      <section class="instrument" id="instrument" data-tone="idle" aria-labelledby="instrument-heading">
-        <h2 class="visually-hidden" id="instrument-heading">Live status</h2>
-        <p class="condition">
-          <span class="condition-dot" aria-hidden="true"></span>
-          <span id="condition-text" role="status">Not recording</span>
-        </p>
-
-        <div class="instrument-body">
-          <div class="instrument-head">
-            <p class="instrument-state" id="tracking-pill"><span id="tracking-state">Not tracking</span></p>
-            <p class="instrument-next" id="next-reading">Stopped</p>
-          </div>
-
-          <dl class="readouts">
-            <div class="readout" id="gps-signal">
-              <dt>GPS</dt>
-              <dd><span class="signal-dot" aria-hidden="true"></span><span id="gps-signal-text">Location: not tracking</span></dd>
-            </div>
-            <div class="readout" id="network-pill">
-              <dt>Connection</dt>
-              <dd><span class="pill-dot" aria-hidden="true"></span><span id="network-state">Online</span></dd>
-            </div>
-            <div class="readout" id="sync-pill">
-              <dt>Backup</dt>
-              <dd><span class="pill-dot" aria-hidden="true"></span><span id="sync-state">Checking…</span></dd>
-            </div>
-            <div class="readout" id="extra-readout">
-              <dt id="extra-readout-label">Saved</dt>
-              <dd><span id="extra-readout-value">0 points</span></dd>
-            </div>
-          </dl>
-        </div>
-
-        <p class="message" id="message" role="status" aria-live="polite">
-          Ready when you are. Your browser will ask for location permission.
-        </p>
-
-        <div class="instrument-actions" aria-label="Tracking controls">
-          <button class="button button-primary" id="start-button" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M8 5.5v13l10.5-6.5L8 5.5Z" /></svg>
-            Start Tracking
-          </button>
-          <button class="button button-secondary" id="stop-button" type="button" disabled hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect class="icon-fill" x="6.5" y="6.5" width="11" height="11" rx="2" /></svg>
-            Stop tracking
-          </button>
-          <button class="button button-secondary" id="trip-open" type="button" hidden>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c3-1 4-4 7-7s5-5 7-5M15 7h4v4" /></svg>
-            Start a trip
-          </button>
-          <div class="instrument-trip" id="trip-tracking-note" hidden>
-            <a class="button button-secondary" href="#trip-card">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5v11M15 6.5v11" /></svg>
-              Pause or end trip
-            </a>
-            <p class="field-help">Tracking is controlled by your trip.</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Emergency SOS (Phase 5) -->
-      <section class="card sos-card" id="sos-card" aria-labelledby="sos-heading">
-        <div class="card-heading">
-          <h2 id="sos-heading">Emergency</h2>
-          <a class="card-hint sos-settings" href="/emergency" data-needs-server>Contacts and settings</a>
-        </div>
-
-        <div id="sos-unavailable">
-          <p class="backup-text" id="sos-unavailable-text">Checking…</p>
-        </div>
-
-        <div id="sos-ready" hidden>
-          <button class="button button-sos" id="sos-button" type="button" aria-describedby="sos-ready-text">
-            <span class="sos-word" aria-hidden="true">SOS</span>
-            <span class="sos-label">Send SOS</span>
-          </button>
-          <p class="field-help sos-ready-text" id="sos-ready-text"></p>
-          <p class="field-help sos-ready-short" id="sos-ready-short" aria-hidden="true"></p>
-        </div>
-
-        <div id="sos-countdown" hidden>
-          <p class="sos-count" role="alert">Sending SOS in <span id="sos-seconds">5</span>…</p>
-          <p class="field-help" id="sos-fix-status" aria-live="polite"></p>
-          <div class="inline-actions">
-            <button class="button button-sos" id="sos-send-now" type="button">Send now</button>
-            <button class="button button-secondary" id="sos-abort" type="button">Cancel</button>
-          </div>
-        </div>
-
-        <div id="sos-sending" hidden>
-          <p class="sos-count" role="status">Sending SOS…</p>
-        </div>
-
-        <div id="sos-queued" hidden>
-          <p class="sos-count" role="alert">Your SOS is waiting to be sent.</p>
-          <button class="button button-secondary" id="sos-queued-cancel" type="button">Stop trying to send</button>
-        </div>
-
-        <div id="sos-active" hidden>
-          <p class="sos-count" role="status">SOS active since <span id="sos-active-since"></span></p>
-          <p class="field-help" id="sos-active-location"></p>
-          <ul class="sos-status" id="sos-active-list" aria-live="polite"></ul>
-          <div class="inline-actions">
-            <button class="button button-secondary" id="sos-cancel" type="button">I'm safe: cancel SOS</button>
-          </div>
-          <p class="backup-links"><a id="sos-active-link" href="/emergency">Full details</a></p>
-        </div>
-
-        <p class="sos-message" id="sos-message" role="status" hidden></p>
-        <a class="call-112" href="tel:112"><span class="call-112-lead">In immediate danger?</span> <strong>Call 112</strong></a>
-        <p class="field-help sos-disclaimer">Safe Location alerts your trusted contacts. It does not contact emergency services.</p>
-      </section>
-
       <!-- Map -->
-      <section class="card map-card" aria-labelledby="map-heading">
-        <div class="map-toolbar">
-          <h2 id="map-heading">Map</h2>
-          <div class="toolbar-controls">
-            <fieldset class="segmented">
-              <legend class="visually-hidden">Map style</legend>
-              <input type="radio" name="map-style" id="style-street" value="street" checked />
-              <label for="style-street">Street</label>
-              <input type="radio" name="map-style" id="style-dark" value="dark" />
-              <label for="style-dark">Dark</label>
-            </fieldset>
-            <label class="switch">
-              <input type="checkbox" id="follow-toggle" role="switch" checked />
-              <span class="switch-track" aria-hidden="true"></span>
-              <span>Follow</span>
-            </label>
-            <button class="button button-ghost" id="recenter-button" type="button" disabled>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="6.5" /><circle cx="12" cy="12" r="1.8" class="icon-fill" />
-                <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" />
-              </svg>
-              <span class="button-label">Recenter</span>
-            </button>
-            <button class="button button-ghost" id="fit-button" type="button" disabled>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
-              </svg>
-              <span class="button-label">Fit route</span>
-            </button>
-          </div>
-        </div>
-
+      <section class="map-area" aria-labelledby="map-heading">
+        <h2 class="visually-hidden" id="map-heading">Map</h2>
         <div class="map-frame">
           <div id="map" role="region" aria-label="Map of your recorded route"></div>
           <div class="map-overlay" id="map-overlay" role="status">
@@ -194,273 +36,470 @@
           <p class="map-alert" id="map-alert" role="alert" hidden></p>
         </div>
 
-        <ul class="map-legend" aria-label="Map legend">
-          <li><span class="legend-symbol legend-latest" aria-hidden="true"></span>Latest saved position</li>
-          <li><span class="legend-symbol legend-start" aria-hidden="true"></span>Trip start</li>
-          <li><span class="legend-symbol legend-route" aria-hidden="true"></span>Route (latest trip)</li>
-          <li><span class="legend-symbol legend-old-route" aria-hidden="true"></span>Earlier trips</li>
-          <li><span class="legend-symbol legend-gap" aria-hidden="true"></span>Gap: no data recorded</li>
-          <li><span class="legend-symbol legend-warning" aria-hidden="true"></span>Low-accuracy position</li>
-        </ul>
-      </section>
-
-      <!-- The rail: trip, recording settings, backup. One sheet with ruled sections, not a stack of cards. -->
-      <div class="sheet rail">
-        <!-- Trip Mode (Phase 7) -->
-        <section class="sheet-section trip-card" id="trip-card" aria-labelledby="trip-heading">
-          <div class="card-heading">
-            <h2 id="trip-heading">Trip Mode</h2>
-            <a class="card-hint" href="/trips" data-needs-server>Trip history</a>
-          </div>
-
-          <p class="backup-text" id="trip-unavailable">Checking…</p>
-
-          <div id="trip-idle" hidden>
-            <p class="backup-text">Going somewhere? Start a trip and Safe Location watches for a missed arrival or stopped updates, and tells the contacts you choose.</p>
-          </div>
-
-          <form id="trip-form" novalidate hidden>
-            <div class="field">
-              <label for="trip-origin">From</label>
-              <input id="trip-origin" type="text" maxlength="100" autocomplete="off" required placeholder="For example: Yaba, my office" />
-            </div>
-            <div class="field">
-              <label for="trip-destination">To</label>
-              <input id="trip-destination" type="text" maxlength="100" autocomplete="off" required placeholder="For example: home in Lekki" />
-            </div>
-            <div class="field">
-              <label for="trip-arrival">Expected arrival (optional)</label>
-              <input id="trip-arrival" type="time" aria-describedby="trip-arrival-help" />
-              <p class="field-help" id="trip-arrival-help">If the trip hasn't ended by then, you'll be asked to check in.</p>
-            </div>
-            <div class="field">
-              <label for="trip-interval">Record my location every</label>
-              <select id="trip-interval">
-                <option value="60000">1 minute</option>
-                <option value="120000">2 minutes</option>
-                <option value="300000">5 minutes</option>
-                <option value="600000">10 minutes</option>
-              </select>
-            </div>
-            <fieldset class="choice">
-              <legend>Contacts for this trip</legend>
-              <div id="trip-contacts"></div>
-              <p class="field-help" id="trip-contacts-help"></p>
-            </fieldset>
-            <div class="field">
-              <label for="trip-silence">Ask me to check in if no location reaches the server for</label>
-              <select id="trip-silence">
-                <option value="10">10 minutes</option>
-                <option value="15" selected>15 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="60">1 hour</option>
-              </select>
-            </div>
-            <fieldset class="choice">
-              <legend>If I miss a check-in</legend>
-              <label class="check"><input type="radio" name="trip-escalation" value="checkin-then-notify" checked /> <span>Tell my contacts if I don't answer in time</span></label>
-              <label class="check"><input type="radio" name="trip-escalation" value="notify-immediately" /> <span>Tell my contacts straight away</span></label>
-              <label class="check"><input type="radio" name="trip-escalation" value="remind-only" /> <span>Only remind me (contacts are not told)</span></label>
-            </fieldset>
-            <div class="field">
-              <label for="trip-grace">Time to answer a check-in</label>
-              <select id="trip-grace">
-                <option value="5">5 minutes</option>
-                <option value="10" selected>10 minutes</option>
-                <option value="15">15 minutes</option>
-              </select>
-            </div>
-            <label class="check">
-              <input id="trip-notify-start-end" type="checkbox" />
-              <span>Also message my trip contacts when the trip starts and ends</span>
-            </label>
-            <p class="field-help trip-note">Messages only state the facts, for example that you haven't checked in. They never say you're in danger, and Safe Location never contacts emergency services.</p>
-            <p class="field-help status-danger" id="trip-form-error" role="alert"></p>
-            <div class="inline-actions">
-              <button class="button button-primary" type="submit">Start trip</button>
-              <button class="button button-secondary" id="trip-form-cancel" type="button">Not now</button>
-            </div>
-          </form>
-
-          <div id="trip-active" hidden>
-            <p class="trip-title"><span class="trip-badge" id="trip-badge">Active</span> <span id="trip-route"></span></p>
-            <p class="field-help" id="trip-state-text"></p>
-            <div class="trip-checkin" id="trip-checkin" role="alert" hidden>
-              <p id="trip-checkin-text"></p>
-              <button class="button button-primary trip-wide" id="trip-checkin-ok" type="button">I'm OK</button>
-            </div>
-            <dl class="sync-overview">
-              <div><dt>Expected arrival</dt><dd id="trip-eta">Not set</dd></div>
-              <div><dt>Position</dt><dd id="trip-current">Waiting for GPS…</dd></div>
-              <div><dt>Last confirmed location</dt><dd id="trip-confirmed">None yet</dd></div>
-              <div><dt>Waiting to upload</dt><dd id="trip-pending">None</dd></div>
-              <div><dt>Trip contacts</dt><dd id="trip-contacts-list">None</dd></div>
-            </dl>
-            <div class="inline-actions">
-              <button class="button button-secondary" id="trip-pause" type="button">Pause</button>
-              <button class="button button-primary" id="trip-end" type="button">End trip</button>
-            </div>
-            <button class="button button-danger-ghost trip-wide trip-cancel" id="trip-cancel" type="button">Cancel trip</button>
-          </div>
-        </section>
-
-        <!-- Recording settings -->
-        <section class="sheet-section controls-card" aria-labelledby="controls-heading">
-          <div class="card-heading">
-            <h2 id="controls-heading">Recording</h2>
-          </div>
-          <div class="field">
-            <label for="interval-select">Recording interval</label>
-            <select id="interval-select">
-              <option value="60000">Every 1 minute</option>
-              <option value="120000">Every 2 minutes</option>
-              <option value="300000">Every 5 minutes</option>
-              <option value="600000">Every 10 minutes</option>
-            </select>
-            <p class="field-help">One location is saved per interval. The live GPS feed does not create extra records.</p>
-          </div>
-        </section>
-
-        <!-- Backup (account + device registration + upload status) -->
-        <section class="sheet-section backup-card" aria-labelledby="backup-heading">
-          <div class="card-heading">
-            <h2 id="backup-heading">Backup and sync</h2>
-          </div>
-
-          <dl class="sync-overview" id="sync-overview">
-            <div><dt>Connection</dt><dd id="status-connection">Checking…</dd></div>
-            <div><dt>Synchronization</dt><dd id="status-sync">Checking…</dd></div>
-            <div><dt>Last successful sync</dt><dd id="status-last-sync">Not yet</dd></div>
-            <div id="status-storage-row" hidden><dt>Device storage</dt><dd id="status-storage"></dd></div>
-          </dl>
-          <button class="button button-secondary sync-now" id="sync-now" type="button" hidden>Sync now</button>
-
-          <p id="backup-off" class="backup-text" hidden>Backup to an account is coming soon. For now your history is saved on this device only, so clearing this browser's data deletes it.</p>
-          <p id="backup-checking" class="field-help">Checking your account…</p>
-
-          <div id="backup-signed-out" hidden>
-            <p class="backup-text" id="backup-signed-out-text">Your history is saved only in this browser.</p>
-            <div class="inline-actions">
-              <a class="button button-primary" href="/signup">Create account</a>
-              <a class="button button-secondary" href="/signin">Sign in</a>
-            </div>
-          </div>
-
-          <form id="backup-register" novalidate hidden>
-            <p class="backup-text">Register this browser as one of your devices to back up what it records.</p>
-            <div class="field">
-              <label for="device-name">Name this device</label>
-              <input id="device-name" type="text" maxlength="60" autocomplete="off" required />
-            </div>
-            <label class="check" id="claim-row" hidden>
-              <input id="claim-local" type="checkbox" />
-              <span id="claim-local-label">Also back up the points already saved in this browser</span>
-            </label>
-            <button class="button button-primary" type="submit">Register this browser</button>
-            <p class="field-help" id="register-message" role="status" aria-live="polite"></p>
-          </form>
-
-          <div id="backup-active" hidden>
-            <dl class="stats">
-              <div class="stats-wide">
-                <dt>This device</dt>
-                <dd id="backup-device-name">Not registered</dd>
-              </div>
-              <div class="stats-wide">
-                <dt>Details</dt>
-                <dd class="stat-detail" id="stat-sync" aria-live="polite">Checking…</dd>
-              </div>
-            </dl>
-            <button class="button button-secondary backup-claim" id="claim-button" type="button" hidden></button>
-            <p class="field-help" id="others-note" hidden></p>
-            <p class="backup-links"><a href="/account">Devices, trips and account settings</a></p>
-          </div>
-        </section>
-      </div>
-
-      <!-- Details: latest saved location and statistics, side by side on wide screens -->
-      <div class="sheet details-sheet">
-        <section class="sheet-section location-card" aria-labelledby="location-heading">
-          <div class="card-heading">
-            <h2 id="location-heading">Latest saved location</h2>
-          </div>
-          <p class="flag-notice" id="location-flag" hidden></p>
-          <dl class="details">
-            <div>
-              <dt>Latitude</dt>
-              <dd class="value-lg" id="latitude">No data</dd>
-            </div>
-            <div>
-              <dt>Longitude</dt>
-              <dd class="value-lg" id="longitude">No data</dd>
-            </div>
-            <div>
-              <dt>Accuracy</dt>
-              <dd id="accuracy">No data</dd>
-            </div>
-            <div>
-              <dt>Location time</dt>
-              <dd id="last-update">No locations yet</dd>
-            </div>
-            <div class="details-wide">
-              <dt>Location name <span class="dt-note">approximate, from OpenStreetMap</span></dt>
-              <dd id="location-name">Not looked up yet</dd>
-            </div>
-          </dl>
-        </section>
-
-        <!-- Statistics -->
-        <section class="sheet-section stats-card" aria-labelledby="stats-heading">
-          <div class="card-heading">
-            <h2 id="stats-heading">Statistics</h2>
-          </div>
-          <dl class="stats">
-            <div>
-              <dt>Status</dt>
-              <dd id="stat-status">Not tracking</dd>
-            </div>
-            <div>
-              <dt>Interval</dt>
-              <dd id="stat-interval">1 minute</dd>
-            </div>
-            <div>
-              <dt>Total recorded points</dt>
-              <dd class="value-lg" id="stat-total">0</dd>
-            </div>
-            <div>
-              <dt>Points this trip</dt>
-              <dd class="value-lg" id="stat-trip-points">0</dd>
-            </div>
-            <div class="stats-wide">
-              <dt>Estimated distance this trip</dt>
-              <dd class="value-lg" id="stat-distance">0 m</dd>
-              <p class="stat-note">
-                Straight lines between saved points. Real road distance is usually longer.
-                Gaps and flagged points are not counted.
-              </p>
-            </div>
-          </dl>
-        </section>
-      </div>
-
-      <!-- History -->
-      <section class="card history-card" aria-labelledby="history-heading">
-        <div class="card-heading">
-          <div>
-            <h2 id="history-heading">Location history</h2>
-            <p class="card-hint" id="history-count">0 saved points</p>
-          </div>
-          <button class="button button-danger-ghost" id="clear-button" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 12.5h9l1-12.5" /></svg>
-            Clear history
+        <div class="map-tools" role="group" aria-label="Map controls">
+          <button class="button button-ghost map-tool" id="recenter-button" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="6.5" /><circle cx="12" cy="12" r="1.8" class="icon-fill" />
+              <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" />
+            </svg>
+            <span class="button-label">Recenter</span>
           </button>
         </div>
-        <ol class="history-list" id="history-list"></ol>
-        <button class="button button-secondary history-more" id="history-more" type="button" hidden>
-          Show older points
+      </section>
+
+      <!-- Top bar: logo, the one-sentence status (tap for details), account -->
+      <header class="app-header topbar">
+        <a class="brand" href="/" aria-label="Safe Location home">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+            <rect width="64" height="64" rx="15" fill="#7c3aed" />
+            <g fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"><path d="M39.1 14.4A19 19 0 0 1 50.8 34.6"/><path d="M43.7 47A19 19 0 0 1 20.3 47"/><path d="M13.2 34.6A19 19 0 0 1 24.9 14.4"/></g><g fill="#fff"><circle cx="32" cy="13" r="4.2"/><circle cx="48.5" cy="41.5" r="4.2"/><circle cx="15.5" cy="41.5" r="4.2"/><circle cx="32" cy="32" r="7.5"/></g>
+          </svg>
+          <span>Safe Location</span>
+        </a>
+        <div class="status-pill" id="instrument" data-tone="idle">
+          <span class="condition-dot" aria-hidden="true"></span>
+          <span id="condition-text" role="status">Not recording</span>
+          <button class="pill-hit" id="pill-hit" type="button" aria-controls="sheet" aria-label="Show tracker details"></button>
+        </div>
+        <div class="header-status">
+          <a class="header-about" href="/welcome">How it works</a>
+          <a class="pill pill-link" id="account-link" href="/signin" hidden>Sign in</a>
+        </div>
+      </header>
+
+      <div class="notice-bar" id="storage-notice" hidden></div>
+
+      <!-- Emergency SOS (Phase 5): a red button on the map; countdown, sending and status open over the map -->
+      <section class="sos-card" id="sos-card" data-view="unavailable" aria-labelledby="sos-heading">
+        <div class="sos-panel">
+          <div class="sos-head">
+            <h2 id="sos-heading">Emergency</h2>
+            <a class="card-hint sos-settings" href="/emergency" data-needs-server>Contacts and settings</a>
+            <button class="button button-ghost sos-close" id="sos-close" type="button" hidden>Close</button>
+          </div>
+
+          <div id="sos-unavailable">
+            <p class="backup-text" id="sos-unavailable-text">Checking…</p>
+          </div>
+
+          <div id="sos-ready" hidden>
+            <button class="button button-sos" id="sos-button" type="button" aria-describedby="sos-ready-text">
+              <span class="sos-word" aria-hidden="true">SOS</span>
+              <span class="sos-label">Send SOS</span>
+            </button>
+            <p class="field-help sos-ready-text" id="sos-ready-text"></p>
+            <p class="field-help sos-ready-short" id="sos-ready-short" aria-hidden="true"></p>
+          </div>
+
+          <div id="sos-countdown" hidden>
+            <p class="sos-count" role="alert">Sending SOS in <span id="sos-seconds">5</span><span class="sos-ellipsis">…</span></p>
+            <p class="field-help" id="sos-fix-status" aria-live="polite"></p>
+            <div class="inline-actions">
+              <button class="button button-secondary" id="sos-abort" type="button">Cancel</button>
+              <button class="button button-sos" id="sos-send-now" type="button">Send now</button>
+            </div>
+          </div>
+
+          <div id="sos-sending" hidden>
+            <p class="sos-count" role="status">Sending SOS…</p>
+          </div>
+
+          <div id="sos-queued" hidden>
+            <p class="sos-count" role="alert">Your SOS is waiting to be sent.</p>
+            <button class="button button-secondary" id="sos-queued-cancel" type="button">Stop trying to send</button>
+          </div>
+
+          <div id="sos-active" hidden>
+            <p class="sos-count" role="status">SOS active since <span id="sos-active-since"></span></p>
+            <p class="field-help" id="sos-active-location"></p>
+            <ul class="sos-status" id="sos-active-list" aria-live="polite"></ul>
+            <div class="inline-actions sos-active-actions">
+              <button class="button button-secondary" id="sos-hide" type="button">Hide</button>
+              <button class="button button-primary" id="sos-cancel" type="button">I'm safe: cancel SOS</button>
+            </div>
+            <p class="backup-links"><a id="sos-active-link" href="/emergency">Full details</a></p>
+          </div>
+
+          <p class="sos-message" id="sos-message" role="status" hidden></p>
+          <a class="call-112" href="tel:112"><span class="call-112-lead">In immediate danger?</span> <strong>Call 112</strong></a>
+          <p class="field-help sos-disclaimer">Safe Location alerts your trusted contacts. It does not contact emergency services.</p>
+        </div>
+        <button class="sos-fab" id="sos-fab" type="button" aria-label="Emergency: SOS and Call 112" hidden>
+          <span aria-hidden="true">SOS</span>
         </button>
       </section>
+
+      <!-- The sheet: status and controls first, then trip, history, settings and details -->
+      <section class="sheet" id="sheet" aria-label="Tracker">
+        <button class="sheet-grab" id="sheet-grab" type="button" aria-controls="sheet-body" aria-expanded="false" aria-label="Show more"><span></span></button>
+        <div class="sheet-body" id="sheet-body" tabindex="-1">
+          <div class="sheet-emergency">
+            <button class="sheet-sos" id="sheet-sos" type="button" aria-label="Emergency SOS"><span aria-hidden="true">SOS</span></button>
+            <a class="call-112-mini" href="tel:112">Call 112</a>
+          </div>
+          <div class="sheet-status">
+            <div class="sos-sheet-banner" id="sos-sheet-banner" hidden>
+              <span class="sos-sheet-dot" aria-hidden="true"></span>
+              <p id="sos-sheet-text">SOS active</p>
+              <button class="button button-secondary" id="sos-sheet-show" type="button" aria-label="Show SOS details">Show</button>
+            </div>
+            <div class="instrument-head">
+              <p class="instrument-state" id="tracking-pill"><span id="tracking-state">Not tracking</span></p>
+              <p class="instrument-next" id="next-reading">Stopped</p>
+            </div>
+
+            <p class="message" id="message" role="status" aria-live="polite">
+              Ready when you are. Your browser will ask for location permission.
+            </p>
+
+            <div class="sheet-actions" aria-label="Tracking controls">
+              <button class="button button-primary" id="start-button" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path class="icon-fill" d="M8 5.5v13l10.5-6.5L8 5.5Z" /></svg>
+                Start Tracking
+              </button>
+              <button class="button button-secondary" id="stop-button" type="button" disabled hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect class="icon-fill" x="6.5" y="6.5" width="11" height="11" rx="2" /></svg>
+                Stop tracking
+              </button>
+              <button class="button button-secondary" id="trip-open" type="button" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c3-1 4-4 7-7s5-5 7-5M15 7h4v4" /></svg>
+                Start a trip
+              </button>
+              <div class="instrument-trip" id="trip-tracking-note" hidden>
+                <div class="trip-buttons">
+                  <button class="button button-secondary" id="trip-pause" type="button">Pause</button>
+                  <button class="button button-primary" id="trip-end" type="button">End trip</button>
+                </div>
+                <p class="field-help">Tracking is controlled by your trip.</p>
+              </div>
+            </div>
+            <div id="peek-end"></div>
+
+            <dl class="readouts">
+              <div class="readout" id="gps-signal">
+                <dt>GPS</dt>
+                <dd><span class="signal-dot" aria-hidden="true"></span><span id="gps-signal-text">Location: not tracking</span></dd>
+              </div>
+              <div class="readout" id="network-pill">
+                <dt>Connection</dt>
+                <dd><span class="pill-dot" aria-hidden="true"></span><span id="network-state">Online</span></dd>
+              </div>
+              <div class="readout" id="sync-pill">
+                <dt>Backup</dt>
+                <dd><span class="pill-dot" aria-hidden="true"></span><span id="sync-state">Checking…</span></dd>
+              </div>
+              <div class="readout" id="extra-readout">
+                <dt id="extra-readout-label">Saved</dt>
+                <dd><span id="extra-readout-value">0 points</span></dd>
+              </div>
+            </dl>
+          </div>
+
+          <!-- Trip Mode (Phase 7) -->
+          <section class="sheet-section trip-card" id="trip-card" aria-labelledby="trip-heading">
+            <div class="card-heading">
+              <h2 id="trip-heading">Trip Mode</h2>
+              <a class="card-hint" href="/trips" data-needs-server>Trip history</a>
+            </div>
+
+            <p class="backup-text" id="trip-unavailable">Checking…</p>
+
+            <div id="trip-idle" hidden>
+              <p class="backup-text">Going somewhere? Start a trip and Safe Location watches for a missed arrival or stopped updates, and tells the contacts you choose.</p>
+            </div>
+
+            <form id="trip-form" novalidate hidden>
+              <div class="field">
+                <label for="trip-origin">From</label>
+                <input id="trip-origin" type="text" maxlength="100" autocomplete="off" required placeholder="For example: Yaba, my office" />
+              </div>
+              <div class="field">
+                <label for="trip-destination">To</label>
+                <input id="trip-destination" type="text" maxlength="100" autocomplete="off" required placeholder="For example: home in Lekki" />
+              </div>
+              <div class="field">
+                <label for="trip-arrival">Expected arrival (optional)</label>
+                <input id="trip-arrival" type="time" aria-describedby="trip-arrival-help" />
+                <p class="field-help" id="trip-arrival-help">If the trip hasn't ended by then, you'll be asked to check in.</p>
+              </div>
+              <div class="field">
+                <label for="trip-interval">Record my location every</label>
+                <select id="trip-interval">
+                  <option value="60000">1 minute</option>
+                  <option value="120000">2 minutes</option>
+                  <option value="300000">5 minutes</option>
+                  <option value="600000">10 minutes</option>
+                </select>
+              </div>
+              <fieldset class="choice">
+                <legend>Contacts for this trip</legend>
+                <div id="trip-contacts"></div>
+                <p class="field-help" id="trip-contacts-help"></p>
+              </fieldset>
+              <details class="trip-more">
+              <summary><span class="trip-more-title">Check-in options</span><span class="trip-more-sum" id="trip-more-sum">Ask after 15 min · tell contacts if no answer in 10 min</span></summary>
+              <div class="field">
+                <label for="trip-silence">Ask me to check in if no location reaches the server for</label>
+                <select id="trip-silence">
+                  <option value="10">10 minutes</option>
+                  <option value="15" selected>15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="60">1 hour</option>
+                </select>
+              </div>
+              <fieldset class="choice">
+                <legend>If I miss a check-in</legend>
+                <label class="check"><input type="radio" name="trip-escalation" value="checkin-then-notify" checked /> <span>Tell my contacts if I don't answer in time</span></label>
+                <label class="check"><input type="radio" name="trip-escalation" value="notify-immediately" /> <span>Tell my contacts straight away</span></label>
+                <label class="check"><input type="radio" name="trip-escalation" value="remind-only" /> <span>Only remind me (contacts are not told)</span></label>
+              </fieldset>
+              <div class="field">
+                <label for="trip-grace">Time to answer a check-in</label>
+                <select id="trip-grace">
+                  <option value="5">5 minutes</option>
+                  <option value="10" selected>10 minutes</option>
+                  <option value="15">15 minutes</option>
+                </select>
+              </div>
+              <label class="check">
+                <input id="trip-notify-start-end" type="checkbox" />
+                <span>Also message my trip contacts when the trip starts and ends</span>
+              </label>
+              </details>
+              <p class="field-help trip-note">Messages only state the facts, for example that you haven't checked in. They never say you're in danger, and Safe Location never contacts emergency services.</p>
+              <p class="field-help status-danger" id="trip-form-error" role="alert"></p>
+              <div class="inline-actions">
+                <button class="button button-primary" type="submit">Start trip</button>
+                <button class="button button-secondary" id="trip-form-cancel" type="button">Not now</button>
+              </div>
+            </form>
+
+            <div id="trip-active" hidden>
+              <p class="trip-title"><span class="trip-badge" id="trip-badge">Active</span> <span id="trip-route"></span></p>
+              <p class="field-help" id="trip-state-text"></p>
+              <dl class="sync-overview">
+                <div><dt>Expected arrival</dt><dd id="trip-eta">Not set</dd></div>
+                <div><dt>Position</dt><dd id="trip-current">Waiting for GPS…</dd></div>
+                <div><dt>Last confirmed location</dt><dd id="trip-confirmed">None yet</dd></div>
+                <div><dt>Waiting to upload</dt><dd id="trip-pending">None</dd></div>
+                <div><dt>Trip contacts</dt><dd id="trip-contacts-list">None</dd></div>
+              </dl>
+              <button class="button button-danger-ghost trip-wide trip-cancel" id="trip-cancel" type="button">Cancel trip</button>
+            </div>
+          </section>
+
+          <!-- History -->
+          <section class="sheet-section history-card" aria-labelledby="history-heading">
+            <div class="card-heading">
+              <div>
+                <h2 id="history-heading">Location history</h2>
+                <p class="card-hint" id="history-count">0 saved points</p>
+              </div>
+              <div class="history-tools">
+              <button class="button button-ghost icon-button" id="fit-button" type="button" disabled>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                </svg>
+                <span class="button-label">Fit route</span>
+              </button>
+              <button class="button button-danger-ghost" id="clear-button" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 12.5h9l1-12.5" /></svg>
+                Clear history
+              </button>
+              </div>
+            </div>
+            <ol class="history-list" id="history-list"></ol>
+            <button class="button button-secondary history-more" id="history-more" type="button" hidden>
+              Show older points
+            </button>
+          </section>
+
+          <!-- Recording settings -->
+          <section class="sheet-section controls-card" aria-labelledby="controls-heading">
+            <div class="card-heading">
+              <h2 id="controls-heading">Recording</h2>
+            </div>
+            <div class="field">
+              <label for="interval-select">Recording interval</label>
+              <select id="interval-select">
+                <option value="60000">Every 1 minute</option>
+                <option value="120000">Every 2 minutes</option>
+                <option value="300000">Every 5 minutes</option>
+                <option value="600000">Every 10 minutes</option>
+              </select>
+              <p class="field-help">One location is saved per interval. The live GPS feed does not create extra records.</p>
+            </div>
+          </section>
+
+          <!-- Backup (account + device registration + upload status) -->
+          <section class="sheet-section backup-card" aria-labelledby="backup-heading">
+            <div class="card-heading">
+              <h2 id="backup-heading">Backup and sync</h2>
+            </div>
+
+            <dl class="sync-overview" id="sync-overview">
+              <div><dt>Connection</dt><dd id="status-connection">Checking…</dd></div>
+              <div><dt>Synchronization</dt><dd id="status-sync">Checking…</dd></div>
+              <div><dt>Last successful sync</dt><dd id="status-last-sync">Not yet</dd></div>
+              <div id="status-storage-row" hidden><dt>Device storage</dt><dd id="status-storage"></dd></div>
+            </dl>
+            <button class="button button-secondary sync-now" id="sync-now" type="button" hidden>Sync now</button>
+
+            <p id="backup-off" class="backup-text" hidden>Backup to an account is coming soon. For now your history is saved on this device only, so clearing this browser's data deletes it.</p>
+            <p id="backup-checking" class="field-help">Checking your account…</p>
+
+            <div id="backup-signed-out" hidden>
+              <p class="backup-text" id="backup-signed-out-text">Your history is saved only in this browser.</p>
+              <div class="inline-actions">
+                <a class="button button-primary" href="/signup">Create account</a>
+                <a class="button button-secondary" href="/signin">Sign in</a>
+              </div>
+            </div>
+
+            <form id="backup-register" novalidate hidden>
+              <p class="backup-text">Register this browser as one of your devices to back up what it records.</p>
+              <div class="field">
+                <label for="device-name">Name this device</label>
+                <input id="device-name" type="text" maxlength="60" autocomplete="off" required />
+              </div>
+              <label class="check" id="claim-row" hidden>
+                <input id="claim-local" type="checkbox" />
+                <span id="claim-local-label">Also back up the points already saved in this browser</span>
+              </label>
+              <button class="button button-primary" type="submit">Register this browser</button>
+              <p class="field-help" id="register-message" role="status" aria-live="polite"></p>
+            </form>
+
+            <div id="backup-active" hidden>
+              <dl class="stats">
+                <div class="stats-wide">
+                  <dt>This device</dt>
+                  <dd id="backup-device-name">Not registered</dd>
+                </div>
+                <div class="stats-wide">
+                  <dt>Details</dt>
+                  <dd class="stat-detail" id="stat-sync" aria-live="polite">Checking…</dd>
+                </div>
+              </dl>
+              <button class="button button-secondary backup-claim" id="claim-button" type="button" hidden></button>
+              <p class="field-help" id="others-note" hidden></p>
+              <p class="backup-links"><a href="/account">Devices, trips and account settings</a></p>
+            </div>
+          </section>
+
+          <!-- Latest saved location -->
+          <section class="sheet-section location-card" aria-labelledby="location-heading">
+            <div class="card-heading">
+              <h2 id="location-heading">Latest saved location</h2>
+            </div>
+            <p class="flag-notice" id="location-flag" hidden></p>
+            <dl class="details">
+              <div>
+                <dt>Latitude</dt>
+                <dd class="value-lg" id="latitude">No data</dd>
+              </div>
+              <div>
+                <dt>Longitude</dt>
+                <dd class="value-lg" id="longitude">No data</dd>
+              </div>
+              <div>
+                <dt>Accuracy</dt>
+                <dd id="accuracy">No data</dd>
+              </div>
+              <div>
+                <dt>Location time</dt>
+                <dd id="last-update">No locations yet</dd>
+              </div>
+              <div class="details-wide">
+                <dt>Location name <span class="dt-note">approximate, from OpenStreetMap</span></dt>
+                <dd id="location-name">Not looked up yet</dd>
+              </div>
+            </dl>
+          </section>
+
+          <!-- Statistics -->
+          <section class="sheet-section stats-card" aria-labelledby="stats-heading">
+            <div class="card-heading">
+              <h2 id="stats-heading">Statistics</h2>
+            </div>
+            <dl class="stats">
+              <div>
+                <dt>Status</dt>
+                <dd id="stat-status">Not tracking</dd>
+              </div>
+              <div>
+                <dt>Interval</dt>
+                <dd id="stat-interval">1 minute</dd>
+              </div>
+              <div>
+                <dt>Total recorded points</dt>
+                <dd class="value-lg" id="stat-total">0</dd>
+              </div>
+              <div>
+                <dt>Points this trip</dt>
+                <dd class="value-lg" id="stat-trip-points">0</dd>
+              </div>
+              <div class="stats-wide">
+                <dt>Estimated distance this trip</dt>
+                <dd class="value-lg" id="stat-distance">0 m</dd>
+                <p class="stat-note">
+                  Straight lines between saved points. Real road distance is usually longer.
+                  Gaps and flagged points are not counted.
+                </p>
+              </div>
+            </dl>
+          </section>
+
+          <!-- Map: style, follow, key -->
+          <section class="sheet-section legend-card" aria-labelledby="legend-heading">
+            <div class="card-heading">
+              <h2 id="legend-heading">Map</h2>
+            </div>
+            <div class="map-settings">
+              <fieldset class="segmented">
+                <legend class="visually-hidden">Map style</legend>
+                <input type="radio" name="map-style" id="style-dark" value="dark" checked />
+                <label for="style-dark">Dark</label>
+                <input type="radio" name="map-style" id="style-street" value="street" />
+                <label for="style-street">Street</label>
+              </fieldset>
+              <label class="switch">
+                <input type="checkbox" id="follow-toggle" role="switch" checked />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span>Follow my position</span>
+              </label>
+            </div>
+            <ul class="map-legend" aria-label="Map legend">
+              <li><span class="legend-symbol legend-latest" aria-hidden="true"></span>Latest saved position</li>
+              <li><span class="legend-symbol legend-start" aria-hidden="true"></span>Trip start</li>
+              <li><span class="legend-symbol legend-route" aria-hidden="true"></span>Route (latest trip)</li>
+              <li><span class="legend-symbol legend-old-route" aria-hidden="true"></span>Earlier trips</li>
+              <li><span class="legend-symbol legend-gap" aria-hidden="true"></span>Gap: no data recorded</li>
+              <li><span class="legend-symbol legend-warning" aria-hidden="true"></span>Low-accuracy position</li>
+            </ul>
+          </section>
+
+          <footer class="app-footer">
+            <p>
+              Your location history is saved in this browser first. If you sign in and register this browser, it is also
+              backed up to your account. To show the map and place names, the
+              approximate map area and your latest coordinates are sent to OpenStreetMap services (and to CARTO when
+              the Dark map style uses CARTO tiles).
+            </p>
+            <p class="app-footer-links"><a href="/welcome">What Safe Location does, and what it never does</a></p>
+          </footer>
+        </div>
+      </section>
     </main>
+
+    <!-- Trip check-in (Phase 7): asked over everything, so it can't be missed -->
+    <div class="checkin-overlay" id="trip-checkin" role="alert" hidden>
+      <div class="checkin-card">
+        <h2 class="checkin-title">Are you OK?</h2>
+        <p id="trip-checkin-text"></p>
+        <button class="button button-primary trip-wide" id="trip-checkin-ok" type="button">I'm OK</button>
+      </div>
+    </div>
 
     <dialog class="dialog" id="sos-cancel-dialog" aria-labelledby="sos-cancel-title">
       <form method="dialog">
@@ -477,16 +516,6 @@
         </div>
       </form>
     </dialog>
-
-    <footer class="app-footer">
-      <p>
-        Your location history is saved in this browser first. If you sign in and register this browser, it is also
-        backed up to your account. To show the map and place names, the
-        approximate map area and your latest coordinates are sent to OpenStreetMap services (and to CARTO when
-        the Dark map style uses CARTO tiles).
-      </p>
-      <p class="app-footer-links"><a href="/welcome">What Safe Location does, and what it never does</a></p>
-    </footer>
 
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

@@ -39,6 +39,48 @@ npm run dev
 
 Open <http://localhost:3000>. Stop the server with `Ctrl+C`.
 
+## The tracker layout (Phase 8: map first)
+
+The tracker is a full-screen map with everything else one swipe away.
+
+**On a phone**
+* **Top bar:** the logo, the **status pill** (one short line such as "Recording · every 1 minute", coloured violet
+  when all is well, amber when something needs attention, red for SOS or a check-in), and your account initials.
+  Tap the pill to show or hide the details.
+* **On the map:** only **Recenter** (it also turns "follow my position" back on), **Call 112** and the red **SOS**
+  button. Pinch to zoom.
+* **The sheet** at the bottom has three heights. Drag its handle, or tap it:
+  1. **Peek:** the state ("Tracking active"), the next reading, the latest message, and the main buttons
+     (Start Tracking, or Stop tracking + Start a trip, or the trip's Pause + End trip).
+  2. **Half:** adds the four readings (GPS, connection, backup, saved points or trip).
+  3. **Full:** everything: Trip Mode, location history, recording interval, backup and sync, latest location,
+     statistics, and map settings (Dark/Street, Follow my position, map key). At this height SOS and Call 112
+     move into a row at the top of the sheet, so they never cover a form.
+
+**On a computer** (960px and wider) the sheet is a panel on the left and the map fills the rest.
+
+**SOS:** tap the red button for the 5-second countdown (Cancel is the first button). A sent SOS opens over the map
+with each contact's status; **Hide** shows the map again, the SOS button keeps pulsing, and a red banner at the top
+of the sheet keeps it in view. If SOS isn't available (not signed in, or no trusted contacts), the button explains
+what's needed and keeps Call 112 in reach.
+
+**Trip check-in:** "Are you OK?" appears over everything, says why (for example "No location has reached the
+server for 15 minutes") and what happens next, and **I'm OK** is ready to tap.
+
+### Testing Phase 8 by hand
+
+1. Phone size (DevTools device toolbar, or a real phone on the live site): the map fills the screen, the status pill
+   is at the top, and Start Tracking is visible without scrolling.
+2. Drag the sheet handle up and down; tap it to step through the three heights; tap the status pill.
+3. Start tracking: the pill turns violet and the dot breathes; the route draws on the map with a soft glow.
+4. Start a trip while tracking: tracking keeps going (now as part of the trip) and Pause / End trip appear under the
+   status.
+5. Tap SOS, then Cancel: "SOS not sent." appears next to the button and fades.
+6. Signed in with a contact: send an SOS, press Hide, check the pulsing button and the red banner, then Show.
+7. Open the full sheet with a form field focused: SOS and Call 112 sit in the row at the top, not over the field.
+8. Computer size: the panel is on the left, Recenter is at the top right of the map, SOS at the bottom right.
+9. Keyboard only: Tab reaches the sheet handle and every control; Escape closes the SOS panel or cancels a countdown.
+
 ## Files
 
 | File | What it does |
